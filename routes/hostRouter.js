@@ -1,16 +1,17 @@
-const express=require('express');
-const hostRouter=express.Router();
-const path=require('path');
-hostRouter.get('/host/add-home',(req,res,next)=>{
-    
-    res.sendFile(path.join(__dirname,'..','views','addHome.html'));
- });
- const registerHome=[];
- hostRouter.post('/host/add-home',(req,res,next)=>{
-      console.log("Home registered successfully : ",req.body, req.body.houseName);
-      registerHome.push({houseName: req.body.houseName});
-      res.sendFile(path.join(__dirname,'..','views','homeAdded.html'));
- })
+const express = require('express');
+const hostRouter = express.Router();
 
-module.exports=hostRouter;
-module.exports.registerHome=registerHome;
+hostRouter.get('/host/add-home', (req, res, next) => {
+    res.render('addHome');  // ✅ was sendFile
+});
+
+const registerHome = [];
+
+hostRouter.post('/host/add-home', (req, res, next) => {
+    console.log("Home registered successfully : ", req.body, req.body.houseName);
+    registerHome.push({ houseName: req.body.houseName });
+    res.redirect('/');  // ✅ was res.render — redirect back to listings
+});
+
+module.exports = hostRouter;
+module.exports.registerHome = registerHome;
