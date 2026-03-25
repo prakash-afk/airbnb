@@ -16,7 +16,7 @@ app.use(express.urlencoded({extended:true})); // to parse the form data
 app.use(userRouter);
 app.use(hostRouter);
 app.use((req,res,next)=>{
-      res.status(404).sendFile(path.join(__dirname,'views','404.html'));
+      res.status(404).render('404');
 })
 
 
