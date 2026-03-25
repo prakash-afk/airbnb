@@ -10,7 +10,8 @@ const registerHome = [];
 hostRouter.post('/host/add-home', (req, res, next) => {
     console.log("Home registered successfully : ", req.body, req.body.houseName);
     registerHome.push({ houseName: req.body.houseName });
-    res.redirect('/');  // ✅ was res.render — redirect back to listings
+    res.render('homeAdded', { houseName: req.body.houseName });
+    
 });
 
 module.exports = hostRouter;
