@@ -1,7 +1,7 @@
 const express = require('express');
+const { registerHome } = require('../data/homeStore');
 
 const userRouter = express.Router();
-const registerHome = require('./hostRouter').registerHome;
 
 userRouter.get('/', (req, res) => {
   console.log('Registered Homes:', registerHome);
