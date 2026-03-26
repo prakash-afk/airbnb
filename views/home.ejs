@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Airbnb Clone</title>
+    <title>Airbnb — Listings</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="output.css">
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'DM Sans', sans-serif; }
@@ -14,34 +13,36 @@
         .card-inner { transition: transform 0.25s ease, box-shadow 0.25s ease; }
         .fade-in { animation: fadeIn 0.5s ease both; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+        .wishlist-btn { transition: transform 0.2s ease; }
+        .wishlist-btn:hover { transform: scale(1.2); }
+        .wishlist-btn.active { color: #f43f5e; }
     </style>
 </head>
-<body class="bg-rose-50 min-h-screen">
+<body class="bg-rose-50 min-h-screen flex flex-col">
 
-    <!-- Navbar -->
+    <%# Navbar with active tab %>
     <header class="bg-white border-b border-rose-100 sticky top-0 z-10 shadow-sm">
         <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
             <span class="brand text-rose-500 text-2xl">airbnb</span>
-            <a href="/host/add-home"
-               class="bg-rose-500 hover:bg-rose-600 active:scale-95 text-white text-sm font-medium px-5 py-2 rounded-full transition-all duration-200 shadow">
-                + Add Your Home
-            </a>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="/" class="text-rose-500 font-semibold border-b-2 border-rose-500 pb-0.5">Listings</a>
+                <a href="/host/add-home" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Add Home</a>
+            </nav>
         </div>
     </header>
 
-    <!-- Hero -->
-    <section class="max-w-5xl mx-auto px-6 pt-12 pb-6 fade-in">
+    <%# Hero %>
+    <section class="max-w-5xl mx-auto px-6 pt-10 pb-4 fade-in">
         <h1 class="text-4xl font-semibold text-gray-800 leading-tight">
             Find your next <span class="text-rose-500">stay</span>
         </h1>
-        <p class="text-gray-400 mt-2 text-base">Browse homes registered by our hosts</p>
+        <p class="text-gray-400 mt-1 text-base">Browse homes registered by our hosts</p>
     </section>
 
-    <!-- Homes Grid -->
-    <main class="max-w-5xl mx-auto px-6 pb-16">
+    <main class="max-w-5xl mx-auto px-6 pb-16 w-full">
 
         <% if (registerHome.length === 0) { %>
-            <!-- Empty State -->
+            <%# Empty State %>
             <div class="flex flex-col items-center justify-center py-24 text-center fade-in">
                 <div class="text-6xl mb-4">🏠</div>
                 <h2 class="text-xl font-semibold text-gray-700">No homes listed yet</h2>
@@ -53,37 +54,109 @@
             </div>
 
         <% } else { %>
-            <p class="text-sm text-gray-400 mb-6">
-                <span class="font-semibold text-gray-600"><%= registerHome.length %></span>
-                home<%= registerHome.length !== 1 ? 's' : '' %> available
-            </p>
 
+            <%# Count + Add button row %>
+            <div class="flex items-center justify-between mb-6">
+                <p class="text-sm text-gray-400">
+                    <span class="font-semibold text-gray-600"><%= registerHome.length %></span>
+                    home<%= registerHome.length !== 1 ? 's' : '' %> available
+                </p>
+                <a href="/host/add-home"
+                   class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-medium px-4 py-2 rounded-full transition-all shadow">
+                    + Add Home
+                </a>
+            </div>
+
+            <%# Cards Grid %>
             <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <% registerHome.forEach((home, index) => { %>
                     <li class="card fade-in" style="animation-delay: <%= index * 60 %>ms">
-                        <div class="card-inner bg-white rounded-2xl overflow-hidden border border-rose-100">
-                            <!-- Placeholder Image -->
-                            <div class="h-44 bg-gradient-to-br from-rose-100 to-orange-100 flex items-center justify-center text-5xl">
-                                🏡
+                        <div class="card-inner bg-white rounded-2xl overflow-hidden border border-rose-100 shadow-sm">
+
+                            <%# Photo %>
+                            <div class="relative h-48 bg-gradient-to-br from-rose-100 to-orange-100 overflow-hidden">
+                                <% if (home.photo) { %>
+                                    <img src="<%= home.photo %>" alt="<%= home.houseName %>"
+                                        class="w-full h-full object-cover"
+                                        onerror="this.style.display='none'">
+                                <% } else { %>
+                                    <div class="w-full h-full flex items-center justify-center text-5xl">🏡</div>
+                                <% } %>
+
+                                <%# Home type badge %>
+                                <% if (home.homeType) { %>
+                                    <span class="absolute top-3 left-3 bg-white/90 text-gray-600 text-xs font-medium px-2.5 py-1 rounded-full shadow-sm">
+                                        <%= home.homeType %>
+                                    </span>
+                                <% } %>
+
+                                <%# Wishlist button %>
+                                <button class="wishlist-btn absolute top-3 right-3 text-gray-300 text-xl bg-white/90 w-8 h-8 rounded-full flex items-center justify-center shadow-sm">
+                                    ♡
+                                </button>
                             </div>
-                            <!-- Info -->
+
+                            <%# Info %>
                             <div class="p-4">
-                                <h3 class="font-semibold text-gray-800 text-base truncate">
-                                    <%= home.houseName %>
-                                </h3>
-                                <p class="text-gray-400 text-sm mt-0.5">Registered property</p>
-                                <div class="mt-3 flex items-center justify-between">
-                                    <span class="text-rose-500 font-semibold text-sm">View details →</span>
-                                    <span class="bg-rose-50 text-rose-400 text-xs px-2 py-1 rounded-full">Available</span>
+
+                                <%# Name + Rating row %>
+                                <div class="flex items-start justify-between gap-2 mb-1">
+                                    <h3 class="font-semibold text-gray-800 text-base leading-tight line-clamp-1">
+                                        <%= home.houseName %>
+                                    </h3>
+                                    <% if (home.rating && home.rating > 0) { %>
+                                        <span class="flex items-center gap-0.5 text-sm text-gray-700 shrink-0">
+                                            <span class="text-rose-400">★</span>
+                                            <%= home.rating %>
+                                        </span>
+                                    <% } %>
                                 </div>
+
+                                <%# Location %>
+                                <% if (home.location) { %>
+                                    <p class="text-gray-400 text-xs mb-3 flex items-center gap-1">
+                                        <span>📍</span> <%= home.location %>
+                                    </p>
+                                <% } else { %>
+                                    <p class="text-gray-400 text-xs mb-3">Registered property</p>
+                                <% } %>
+
+                                <%# Guests %>
+                                <% if (home.maxGuests) { %>
+                                    <p class="text-gray-400 text-xs mb-3">👥 Up to <%= home.maxGuests %> guests</p>
+                                <% } %>
+
+                                <%# Divider %>
+                                <div class="border-t border-gray-100 pt-3 flex items-center justify-between">
+                                    <% if (home.price) { %>
+                                        <p class="text-gray-800 text-sm">
+                                            <span class="font-semibold text-base">₹<%= home.price %></span>
+                                            <span class="text-gray-400 text-xs"> / night</span>
+                                        </p>
+                                    <% } else { %>
+                                        <p class="text-gray-400 text-xs">Price not set</p>
+                                    <% } %>
+                                    <span class="bg-rose-50 text-rose-400 text-xs px-2.5 py-1 rounded-full">Available</span>
+                                </div>
+
                             </div>
                         </div>
                     </li>
                 <% }) %>
             </ul>
-        <% } %>
 
+        <% } %>
     </main>
+
+    <script>
+        // Wishlist toggle
+        document.querySelectorAll('.wishlist-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.classList.toggle('active');
+                btn.textContent = btn.classList.contains('active') ? '♥' : '♡';
+            });
+        });
+    </script>
 
 </body>
 </html>
