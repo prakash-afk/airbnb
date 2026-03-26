@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 
+const errorController = require('./controllers/errorController');
 const userRouter = require('./routes/userRouter');
 const hostRouter = require('./routes/hostRouter');
 
@@ -15,9 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(userRouter);
 app.use(hostRouter);
 
-app.use((req, res) => {
-  res.status(404).render('404');
-});
+app.use(errorController.get404);
 
 module.exports = app;
 
