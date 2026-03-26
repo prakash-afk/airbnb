@@ -1,25 +1,29 @@
-//External Modules
-const express=require('express');
+const express = require('express');
+const path = require('path');
 
-//Local Modules
-const userRouter=require('./routes/userRouter');
-const hostRouter=require('./routes/hostRouter');
-const app=express();
-//core modules
-const path=require('path');
+const userRouter = require('./routes/userRouter');
+const hostRouter = require('./routes/hostRouter');
 
-app.set('view engine','ejs'); // to set the view engine as ejs
-app.use(express.static(path.join(__dirname,'public'))); // to serve static files like css,js,images
+const app = express();
 
-app.use(express.urlencoded({extended:true})); // to parse the form data
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: true }));
 
 app.use(userRouter);
 app.use(hostRouter);
-app.use((req,res,next)=>{
-      res.status(404).render('404');
-})
 
+app.use((req, res) => {
+  res.status(404).render('404');
+});
 
- app.listen(3001,()=>{
-    console.log('Server running at http://localhost:3001/');
- })
+module.exports = app;
+
+if (require.main === module) {
+  const port = process.env.PORT || 3001;
+  app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}/`);
+  });
+}
