@@ -59,8 +59,11 @@
     <header class="bg-white border-b border-rose-100 sticky top-0 z-10 shadow-sm">
         <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
             <span class="brand text-rose-500 text-2xl">airbnb</span>
-            <nav class="flex items-center gap-6 text-sm">
+            <nav class="flex items-center gap-6 text-sm flex-wrap justify-end">
                 <a href="/" class="text-rose-500 font-semibold border-b-2 border-rose-500 pb-0.5">Listings</a>
+                <a href="/favourites" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Favourites</a>
+                <a href="/bookings" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Bookings</a>
+                <a href="/host/homes" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Host Homes</a>
                 <a href="/host/add-home" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Add Home</a>
             </nav>
         </div>
@@ -174,6 +177,17 @@
                                     <span class="<%= home.availability === 'available' ? 'bg-rose-50 text-rose-400' : 'bg-gray-100 text-gray-500' %> text-xs px-2.5 py-1 rounded-full">
                                         <%= home.availability === 'available' ? 'Available' : 'Unavailable' %>
                                     </span>
+                                </div>
+
+                                <div class="mt-4 flex gap-2">
+                                    <a href="/homes/<%= home.id %>"
+                                       class="flex-1 bg-white hover:bg-rose-50 text-rose-500 text-xs font-medium px-3 py-2 rounded-xl text-center border border-rose-200 transition-all">
+                                        Details
+                                    </a>
+                                    <a href="/reserve/<%= home.id %>"
+                                       class="flex-1 bg-rose-500 hover:bg-rose-600 text-white text-xs font-medium px-3 py-2 rounded-xl text-center transition-all">
+                                        Reserve
+                                    </a>
                                 </div>
 
                             </div>
