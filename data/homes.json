@@ -1,22 +1,46 @@
 [
   {
-    "houseName": "Persisted Home",
-    "price": 7000,
-    "location": "Kolkata",
-    "rating": 5,
-    "photo": "https://travel.home.sndimg.com/content/dam/images/travel/fullrights/2016/9/23/0/CI_Airbnb_Utah.jpg.rend.hgtvcom.1280.853.suffix/1491593507925.jpeg",
-    "homeType": "Villa",
-    "maxGuests": 4,
+    "id": "02be91e6-2dd4-4e89-83c6-d772e70ab5fa",
+    "houseName": "Legacy Home",
+    "price": 1000,
+    "location": "Delhi",
+    "rating": 4,
+    "photo": "",
+    "homeType": "House",
+    "maxGuests": 2,
     "availability": "available"
   },
   {
+    "id": "b18b0d04-ea3f-4136-9e5a-9d0be117f7e3",
+    "houseName": "Validated Stay",
+    "price": 3500,
+    "location": "Goa",
+    "rating": 4,
+    "photo": "https://example.com/a.jpg",
+    "homeType": "Villa",
+    "maxGuests": 3,
+    "availability": "available"
+  },
+  {
+    "id": "c72ae49d-8262-4730-9c8f-82b7000e08a5",
     "houseName": "Sunita Sadan",
-    "price": 25001,
+    "price": 25,
     "location": "Patna",
-    "rating": 5,
-    "photo": "https://travel.home.sndimg.com/content/dam/images/travel/fullrights/2016/9/23/0/CI_Airbnb_Utah.jpg.rend.hgtvcom.1280.853.suffix/1491593507925.jpeg",
+    "rating": 1,
+    "photo": "",
     "homeType": "Farm",
-    "maxGuests": 2,
+    "maxGuests": 20,
+    "availability": "available"
+  },
+  {
+    "id": "239ff3cc-49ed-4af5-a38d-afe9520d81a4",
+    "houseName": "55",
+    "price": 7,
+    "location": "5",
+    "rating": 0,
+    "photo": "https://travel.home.sndimg.com/content/dam/images/travel/fullrights/2016/9/23/0/CI_Airbnb_Utah.jpg.rend.hgtvcom.1280.853.suffix/1491593507925.jpeg",
+    "homeType": "Beach House",
+    "maxGuests": 1,
     "availability": "available"
   }
 ]

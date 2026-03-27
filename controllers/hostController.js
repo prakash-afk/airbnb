@@ -1,10 +1,43 @@
 const Home = require('../models/home');
 
+const defaultFormData = {
+  houseName: '',
+  location: '',
+  price: '',
+  photo: '',
+  rating: '0',
+  homeType: '',
+  maxGuests: '2',
+  availability: 'available',
+};
+
 exports.getAddHome = (req, res) => {
-  res.render('addHome');
+  res.render('addHome', {
+    errors: [],
+    oldInput: defaultFormData,
+  });
 };
 
 exports.postAddHome = (req, res, next) => {
+  const validationErrors = Home.validate(req.body);
+
+  if (validationErrors.length > 0) {
+    res.status(422).render('addHome', {
+      errors: validationErrors,
+      oldInput: {
+        houseName: req.body.houseName || '',
+        location: req.body.location || '',
+        price: req.body.price || '',
+        photo: req.body.photo || '',
+        rating: req.body.rating || '0',
+        homeType: req.body.homeType || '',
+        maxGuests: req.body.maxGuests || '2',
+        availability: req.body.availability || 'available',
+      },
+    });
+    return;
+  }
+
   const newHome = new Home(
     req.body.houseName,
     req.body.price,

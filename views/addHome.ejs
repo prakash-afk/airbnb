@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Home — Airbnb</title>
+    <title>Add Home - Airbnb</title>
     <link rel="stylesheet" href="/output.css">
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -12,29 +12,42 @@
         .fade-up { animation: fadeUp 0.5s ease both; }
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: none; }
+            to { opacity: 1; transform: none; }
         }
         .input-field { transition: border-color 0.2s, box-shadow 0.2s; }
         .input-field:focus {
             outline: none;
             border-color: #f43f5e;
-            box-shadow: 0 0 0 4px rgba(244,63,94,0.12);
+            box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.12);
         }
         .submit-btn { transition: transform 0.15s ease, box-shadow 0.2s ease; }
-        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(244,63,94,0.35); }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(244, 63, 94, 0.35); }
         .submit-btn:active { transform: scale(0.97); }
         .card-shimmer { animation: shimmer 0.6s ease both; }
         @keyframes shimmer {
             from { opacity: 0; transform: scale(0.96); }
-            to   { opacity: 1; transform: scale(1); }
+            to { opacity: 1; transform: scale(1); }
         }
         .star { cursor: pointer; transition: transform 0.1s; }
         .star:hover { transform: scale(1.2); }
+        .field-warning {
+            min-height: 1.25rem;
+            transition: opacity 0.2s ease;
+        }
     </style>
 </head>
 <body class="bg-rose-50 min-h-screen flex flex-col">
+    <% const formData = typeof oldInput !== 'undefined' ? oldInput : {
+        houseName: '',
+        location: '',
+        price: '',
+        photo: '',
+        rating: '0',
+        homeType: '',
+        maxGuests: '2',
+        availability: 'available'
+    }; %>
 
-    <%# Navbar with active tab %>
     <header class="bg-white border-b border-rose-100 sticky top-0 z-10 shadow-sm">
         <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
             <a href="/" class="brand text-rose-500 text-2xl">airbnb</a>
@@ -45,7 +58,6 @@
         </div>
     </header>
 
-    <%# Progress Steps %>
     <div class="bg-white border-b border-rose-50">
         <div class="max-w-5xl mx-auto px-6 py-3 flex items-center gap-3">
             <div class="flex items-center gap-2">
@@ -68,8 +80,6 @@
     <main class="flex-1 flex items-center justify-center px-4 py-12">
         <div class="w-full max-w-lg card-shimmer">
             <div class="bg-white rounded-3xl border border-rose-100 shadow-xl overflow-hidden">
-
-                <%# Banner %>
                 <div class="bg-gradient-to-r from-rose-400 to-orange-300 px-8 py-6 relative overflow-hidden">
                     <div class="absolute -top-6 -right-6 w-28 h-28 bg-white/10 rounded-full"></div>
                     <div class="absolute -bottom-8 -left-4 w-20 h-20 bg-white/10 rounded-full"></div>
@@ -79,165 +89,208 @@
                 </div>
 
                 <form action="/host/add-home" method="post" class="px-8 py-8 space-y-5">
+                    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                        <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-4 text-sm text-rose-600">
+                            <p class="font-semibold mb-2">Please fix these issues before submitting:</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <% errors.forEach(error => { %>
+                                    <li><%= error %></li>
+                                <% }) %>
+                            </ul>
+                        </div>
+                    <% } %>
 
-                    <%# House Name %>
                     <div class="fade-up" style="animation-delay:0.1s">
                         <label class="block text-sm font-medium text-gray-600 mb-1.5">
                             Home Name <span class="text-rose-400">*</span>
                         </label>
-                        <input type="text" name="houseName" id="houseName"
+                        <input
+                            type="text"
+                            name="houseName"
+                            id="houseName"
                             placeholder="e.g. Cozy Mountain Retreat"
-                            required maxlength="60"
-                            class="input-field w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 text-sm bg-rose-50/30 placeholder-gray-300">
+                            required
+                            maxlength="60"
+                            value="<%= formData.houseName %>"
+                            class="input-field w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 text-sm bg-rose-50/30 placeholder-gray-300"
+                        >
                         <div class="flex justify-between mt-1">
                             <p class="text-xs text-gray-400">Make it catchy and memorable</p>
                             <span class="text-xs text-gray-300" id="charCount">0 / 60</span>
                         </div>
+                        <p id="houseNameWarning" class="field-warning mt-1 text-xs text-amber-600"></p>
                     </div>
 
-                    <%# Location %>
                     <div class="fade-up" style="animation-delay:0.15s">
                         <label class="block text-sm font-medium text-gray-600 mb-1.5">
                             Location <span class="text-rose-400">*</span>
                         </label>
-                        <div class="relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-base">📍</span>
-                            <input type="text" name="location"
-                                placeholder="e.g. Manali, Himachal Pradesh"
-                                required
-                                class="input-field w-full border border-gray-200 rounded-xl pl-9 pr-4 py-3 text-gray-800 text-sm bg-rose-50/30 placeholder-gray-300">
-                        </div>
+                        <input
+                            type="text"
+                            id="location"
+                            name="location"
+                            placeholder="e.g. Manali, Himachal Pradesh"
+                            required
+                            value="<%= formData.location %>"
+                            class="input-field w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 text-sm bg-rose-50/30 placeholder-gray-300"
+                        >
+                        <p id="locationWarning" class="field-warning mt-1 text-xs text-amber-600"></p>
                     </div>
 
-                    <%# Price per Night %>
                     <div class="fade-up" style="animation-delay:0.2s">
                         <label class="block text-sm font-medium text-gray-600 mb-1.5">
                             Price per Night <span class="text-rose-400">*</span>
                         </label>
                         <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold text-sm">₹</span>
-                            <input type="number" name="price" min="0" placeholder="2500"
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold text-sm">Rs</span>
+                            <input
+                                type="number"
+                                name="price"
+                                min="1"
+                                step="1"
+                                placeholder="2500"
                                 required
-                                class="input-field w-full border border-gray-200 rounded-xl pl-8 pr-4 py-3 text-gray-800 text-sm bg-rose-50/30 placeholder-gray-300">
+                                value="<%= formData.price %>"
+                                class="input-field w-full border border-gray-200 rounded-xl pl-12 pr-4 py-3 text-gray-800 text-sm bg-rose-50/30 placeholder-gray-300"
+                            >
                         </div>
                     </div>
 
-                    <%# Photo URL %>
                     <div class="fade-up" style="animation-delay:0.25s">
                         <label class="block text-sm font-medium text-gray-600 mb-1.5">Photo URL</label>
-                        <div class="relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-base">🖼️</span>
-                            <input type="url" name="photo" id="photoUrl"
-                                placeholder="https://example.com/photo.jpg"
-                                class="input-field w-full border border-gray-200 rounded-xl pl-9 pr-4 py-3 text-gray-800 text-sm bg-rose-50/30 placeholder-gray-300">
-                        </div>
-                        <%# Preview %>
+                        <input
+                            type="url"
+                            name="photo"
+                            id="photoUrl"
+                            placeholder="https://example.com/photo.jpg"
+                            value="<%= formData.photo %>"
+                            class="input-field w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 text-sm bg-rose-50/30 placeholder-gray-300"
+                        >
                         <div id="imgPreviewBox" class="hidden mt-2 rounded-xl overflow-hidden border border-rose-100 h-36">
                             <img id="imgPreview" src="" alt="Preview" class="w-full h-full object-cover">
                         </div>
                     </div>
 
-                    <%# Star Rating %>
                     <div class="fade-up" style="animation-delay:0.3s">
                         <label class="block text-sm font-medium text-gray-600 mb-2">Rating</label>
                         <div class="flex items-center gap-2">
                             <div class="flex gap-1" id="starContainer">
-                                <% for(let i = 1; i <= 5; i++) { %>
-                                    <span class="star text-3xl text-gray-200" data-value="<%= i %>">★</span>
+                                <% for (let i = 1; i <= 5; i++) { %>
+                                    <span class="star text-3xl text-gray-200" data-value="<%= i %>">&#9733;</span>
                                 <% } %>
                             </div>
                             <span class="text-sm text-gray-400 ml-2" id="ratingLabel">Not rated</span>
                         </div>
-                        <input type="hidden" name="rating" id="ratingInput" value="0">
+                        <input type="hidden" name="rating" id="ratingInput" value="<%= formData.rating %>">
                     </div>
 
-                    <%# Home Type %>
                     <div class="fade-up" style="animation-delay:0.35s">
                         <label class="block text-sm font-medium text-gray-600 mb-2">Home Type</label>
                         <div class="grid grid-cols-3 gap-2">
                             <% const homeTypes = [
-                                { emoji: '🏠', label: 'House' },
-                                { emoji: '🏢', label: 'Apartment' },
-                                { emoji: '🏕️', label: 'Cabin' },
-                                { emoji: '🏖️', label: 'Beach House' },
-                                { emoji: '🌾', label: 'Farm' },
-                                { emoji: '🏰', label: 'Villa' }
-                            ] %>
+                                { label: 'House' },
+                                { label: 'Apartment' },
+                                { label: 'Cabin' },
+                                { label: 'Beach House' },
+                                { label: 'Farm' },
+                                { label: 'Villa' }
+                            ]; %>
                             <% homeTypes.forEach(type => { %>
-                                <button type="button" data-type="<%= type.label %>"
-                                    class="type-pill border border-gray-200 rounded-xl py-3 text-center text-sm text-gray-500 hover:border-rose-300 hover:bg-rose-50 transition-all duration-200">
-                                    <%= type.emoji %><br>
+                                <button
+                                    type="button"
+                                    data-type="<%= type.label %>"
+                                    class="type-pill border border-gray-200 rounded-xl py-3 text-center text-sm text-gray-500 hover:border-rose-300 hover:bg-rose-50 transition-all duration-200 <%= formData.homeType === type.label ? 'border-rose-400 bg-rose-50 text-rose-600' : '' %>"
+                                >
                                     <span class="text-xs mt-1 block"><%= type.label %></span>
                                 </button>
                             <% }) %>
                         </div>
-                        <input type="hidden" name="homeType" id="homeTypeInput">
+                        <input type="hidden" name="homeType" id="homeTypeInput" value="<%= formData.homeType %>">
                     </div>
 
-                    <%# Guest Counter %>
                     <div class="fade-up" style="animation-delay:0.4s">
                         <label class="block text-sm font-medium text-gray-600 mb-2">Max Guests</label>
                         <div class="flex items-center gap-4 bg-rose-50/40 rounded-xl px-4 py-3 border border-gray-200">
-                            <button type="button" id="decrease"
-                                class="w-8 h-8 rounded-full border border-gray-200 bg-white text-rose-400 font-bold text-lg flex items-center justify-center hover:bg-rose-50 active:scale-90 transition-all">−</button>
-                            <span class="flex-1 text-center text-gray-700 font-semibold text-lg" id="guestCount">2</span>
-                            <button type="button" id="increase"
-                                class="w-8 h-8 rounded-full border border-gray-200 bg-white text-rose-400 font-bold text-lg flex items-center justify-center hover:bg-rose-50 active:scale-90 transition-all">+</button>
-                            <input type="hidden" name="maxGuests" id="maxGuestsInput" value="2">
+                            <button type="button" id="decrease" class="w-8 h-8 rounded-full border border-gray-200 bg-white text-rose-400 font-bold text-lg flex items-center justify-center hover:bg-rose-50 active:scale-90 transition-all">-</button>
+                            <span class="flex-1 text-center text-gray-700 font-semibold text-lg" id="guestCount"><%= formData.maxGuests %></span>
+                            <button type="button" id="increase" class="w-8 h-8 rounded-full border border-gray-200 bg-white text-rose-400 font-bold text-lg flex items-center justify-center hover:bg-rose-50 active:scale-90 transition-all">+</button>
+                            <input type="hidden" name="maxGuests" id="maxGuestsInput" value="<%= formData.maxGuests %>">
                         </div>
                     </div>
 
-                    <%# Availability %>
                     <div class="fade-up" style="animation-delay:0.43s">
                         <label class="block text-sm font-medium text-gray-600 mb-2">Availability</label>
                         <div class="grid grid-cols-2 gap-3">
                             <label class="flex items-center gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-gray-700">
-                                <input type="radio" name="availability" value="available" checked class="accent-rose-500">
+                                <input type="radio" name="availability" value="available" <%= formData.availability !== 'unavailable' ? 'checked' : '' %> class="accent-rose-500">
                                 <span>Available for booking</span>
                             </label>
                             <label class="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700">
-                                <input type="radio" name="availability" value="unavailable" class="accent-rose-500">
+                                <input type="radio" name="availability" value="unavailable" <%= formData.availability === 'unavailable' ? 'checked' : '' %> class="accent-rose-500">
                                 <span>Not available right now</span>
                             </label>
                         </div>
                     </div>
 
-                    <%# Submit %>
                     <div class="fade-up pt-2" style="animation-delay:0.45s">
-                        <button type="submit"
-                            class="submit-btn w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3.5 rounded-xl text-sm tracking-wide shadow-md">
-                            Register Home →
+                        <button type="submit" class="submit-btn w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3.5 rounded-xl text-sm tracking-wide shadow-md">
+                            Register Home
                         </button>
                         <p class="text-center text-xs text-gray-400 mt-3">
                             By submitting, you agree to our
                             <a href="#" class="text-rose-400 hover:underline">hosting terms</a>
                         </p>
                     </div>
-
                 </form>
             </div>
 
             <div class="text-center mt-5 fade-up" style="animation-delay:0.5s">
-                <a href="/" class="text-sm text-gray-400 hover:text-rose-400 transition-colors">← Back to listings</a>
+                <a href="/" class="text-sm text-gray-400 hover:text-rose-400 transition-colors">&larr; Back to listings</a>
             </div>
         </div>
     </main>
 
     <script>
-        // Char counter
         const houseNameInput = document.getElementById('houseName');
+        const locationInput = document.getElementById('location');
         const charCount = document.getElementById('charCount');
+        const houseNameWarning = document.getElementById('houseNameWarning');
+        const locationWarning = document.getElementById('locationWarning');
+        const textPattern = /^(?=.*[A-Za-z])[A-Za-z0-9\s,.'-]+$/;
+        charCount.textContent = `${houseNameInput.value.length} / 60`;
+
         houseNameInput.addEventListener('input', () => {
             const len = houseNameInput.value.length;
             charCount.textContent = `${len} / 60`;
             charCount.classList.toggle('text-rose-400', len > 50);
+            validateTextField(houseNameInput, houseNameWarning, 'Use a real home name, not only numbers or symbols.');
         });
 
-        // Photo URL preview
+        locationInput.addEventListener('input', () => {
+            validateTextField(locationInput, locationWarning, 'Use a real location name, not only numbers or symbols.');
+        });
+
+        function validateTextField(input, warningElement, message) {
+            const value = input.value.trim();
+
+            if (!value) {
+                warningElement.textContent = '';
+                input.classList.remove('border-amber-400', 'bg-amber-50/40');
+                return true;
+            }
+
+            const isValid = textPattern.test(value);
+            warningElement.textContent = isValid ? '' : message;
+            input.classList.toggle('border-amber-400', !isValid);
+            input.classList.toggle('bg-amber-50/40', !isValid);
+            return isValid;
+        }
+
         const photoUrl = document.getElementById('photoUrl');
         const imgPreview = document.getElementById('imgPreview');
         const imgPreviewBox = document.getElementById('imgPreviewBox');
-        photoUrl.addEventListener('input', () => {
+
+        function updatePreview() {
             const url = photoUrl.value.trim();
             if (url) {
                 imgPreview.src = url;
@@ -246,61 +299,84 @@
             } else {
                 imgPreviewBox.classList.add('hidden');
             }
-        });
+        }
 
-        // Star rating
+        photoUrl.addEventListener('input', updatePreview);
+        updatePreview();
+
         const stars = document.querySelectorAll('.star');
         const ratingInput = document.getElementById('ratingInput');
         const ratingLabel = document.getElementById('ratingLabel');
         const labels = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'];
-        stars.forEach(star => {
+
+        function paintStars(current) {
+            ratingLabel.textContent = labels[current] || 'Not rated';
+            stars.forEach((star) => {
+                const value = parseInt(star.dataset.value);
+                star.classList.toggle('text-rose-400', value <= current);
+                star.classList.toggle('text-gray-200', value > current);
+            });
+        }
+
+        stars.forEach((star) => {
             star.addEventListener('click', () => {
-                const val = parseInt(star.dataset.value);
-                ratingInput.value = val;
-                ratingLabel.textContent = labels[val];
-                stars.forEach(s => {
-                    const v = parseInt(s.dataset.value);
-                    s.classList.toggle('text-rose-400', v <= val);
-                    s.classList.toggle('text-gray-200', v > val);
-                });
+                const value = parseInt(star.dataset.value);
+                ratingInput.value = value;
+                paintStars(value);
             });
+
             star.addEventListener('mouseenter', () => {
-                const val = parseInt(star.dataset.value);
-                stars.forEach(s => {
-                    s.classList.toggle('text-rose-300', parseInt(s.dataset.value) <= val);
+                const value = parseInt(star.dataset.value);
+                stars.forEach((item) => {
+                    item.classList.toggle('text-rose-300', parseInt(item.dataset.value) <= value);
                 });
             });
+
             star.addEventListener('mouseleave', () => {
-                const current = parseInt(ratingInput.value);
-                stars.forEach(s => {
-                    const v = parseInt(s.dataset.value);
-                    s.classList.remove('text-rose-300');
-                    s.classList.toggle('text-rose-400', v <= current);
-                    s.classList.toggle('text-gray-200', v > current);
+                const current = parseInt(ratingInput.value) || 0;
+                stars.forEach((item) => {
+                    const value = parseInt(item.dataset.value);
+                    item.classList.remove('text-rose-300');
+                    item.classList.toggle('text-rose-400', value <= current);
+                    item.classList.toggle('text-gray-200', value > current);
                 });
             });
         });
 
-        // Home type pills
+        paintStars(parseInt(ratingInput.value) || 0);
+
         const pills = document.querySelectorAll('.type-pill');
         const homeTypeInput = document.getElementById('homeTypeInput');
-        pills.forEach(pill => {
+        pills.forEach((pill) => {
             pill.addEventListener('click', () => {
-                pills.forEach(p => p.classList.remove('border-rose-400', 'bg-rose-50', 'text-rose-600'));
+                pills.forEach((button) => button.classList.remove('border-rose-400', 'bg-rose-50', 'text-rose-600'));
                 pill.classList.add('border-rose-400', 'bg-rose-50', 'text-rose-600');
                 homeTypeInput.value = pill.dataset.type;
             });
         });
 
-        // Guest counter
-        let guests = 2;
+        let guests = parseInt(document.getElementById('maxGuestsInput').value) || 2;
         function updateGuests() {
             document.getElementById('guestCount').textContent = guests;
             document.getElementById('maxGuestsInput').value = guests;
         }
-        document.getElementById('increase').addEventListener('click', () => { if (guests < 20) { guests++; updateGuests(); } });
-        document.getElementById('decrease').addEventListener('click', () => { if (guests > 1) { guests--; updateGuests(); } });
-    </script>
 
+        updateGuests();
+        validateTextField(houseNameInput, houseNameWarning, 'Use a real home name, not only numbers or symbols.');
+        validateTextField(locationInput, locationWarning, 'Use a real location name, not only numbers or symbols.');
+        document.getElementById('increase').addEventListener('click', () => {
+            if (guests < 20) {
+                guests += 1;
+                updateGuests();
+            }
+        });
+
+        document.getElementById('decrease').addEventListener('click', () => {
+            if (guests > 1) {
+                guests -= 1;
+                updateGuests();
+            }
+        });
+    </script>
 </body>
 </html>
