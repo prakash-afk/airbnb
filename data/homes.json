@@ -1,0 +1,12 @@
+[
+  {
+    "houseName": "Persisted Home",
+    "price": 7000,
+    "location": "Kolkata",
+    "rating": 5,
+    "photo": "https://example.com/p.jpg",
+    "homeType": "Villa",
+    "maxGuests": 4,
+    "availability": "available"
+  }
+]

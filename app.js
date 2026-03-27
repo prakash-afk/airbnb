@@ -17,6 +17,7 @@ app.use(userRouter);
 app.use(hostRouter);
 
 app.use(errorController.get404);
+app.use(errorController.get500);
 
 module.exports = app;
 

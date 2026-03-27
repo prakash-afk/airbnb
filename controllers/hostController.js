@@ -4,7 +4,7 @@ exports.getAddHome = (req, res) => {
   res.render('addHome');
 };
 
-exports.postAddHome = (req, res) => {
+exports.postAddHome = (req, res, next) => {
   const newHome = new Home(
     req.body.houseName,
     req.body.price,
@@ -14,11 +14,18 @@ exports.postAddHome = (req, res) => {
     req.body.homeType,
     req.body.maxGuests,
     req.body.availability
-  ).save();
+  );
 
-  console.log('Home registered successfully:', newHome);
-  res.render('homeAdded', {
-    houseName: newHome.houseName,
-    home: newHome,
+  newHome.save((error, savedHome) => {
+    if (error) {
+      next(error);
+      return;
+    }
+
+    console.log('Home registered successfully:', savedHome);
+    res.render('homeAdded', {
+      houseName: savedHome.houseName,
+      home: savedHome,
+    });
   });
 };

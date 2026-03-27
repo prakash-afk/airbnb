@@ -1,8 +1,13 @@
 const Home = require('../models/home');
 
-exports.getHome = (req, res) => {
-  const registeredHomes = Home.fetchAll();
+exports.getHome = (req, res, next) => {
+  Home.fetchAll((error, registeredHomes) => {
+    if (error) {
+      next(error);
+      return;
+    }
 
-  console.log('Registered Homes:', registeredHomes);
-  res.render('home', { registerHome: registeredHomes });
+    console.log('Registered Homes:', registeredHomes);
+    res.render('home', { registerHome: registeredHomes });
+  });
 };
