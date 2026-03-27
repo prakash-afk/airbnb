@@ -16,5 +16,8 @@ exports.postAddHome = (req, res) => {
   ).save();
 
   console.log('Home registered successfully:', newHome);
-  res.render('homeAdded', { houseName: newHome.houseName });
+  res.render('homeAdded', {
+    houseName: newHome.houseName,
+    home: newHome,
+  });
 };

@@ -104,19 +104,34 @@
                         </div>
                     <% } %>
 
-                    <%# What's next checklist %>
+                    <%# Listing status checklist %>
                     <div class="fade-up space-y-3" style="animation-delay: 0.2s">
-                        <p class="text-sm font-medium text-gray-600">What's next?</p>
+                        <p class="text-sm font-medium text-gray-600">Listing status</p>
                         <% const steps = [
-                            { icon: '📸', text: 'Add photos of your home' },
-                            { icon: '💰', text: 'Set your nightly price' },
-                            { icon: '📅', text: 'Update your availability' }
+                            {
+                                icon: '📸',
+                                text: home && home.photo ? 'Photos added to your listing' : 'Photo still missing from this listing',
+                                status: home && home.photo ? 'Done' : 'Missing',
+                                statusClass: home && home.photo ? 'text-emerald-500' : 'text-amber-500'
+                            },
+                            {
+                                icon: '💰',
+                                text: home && home.price ? `Price set at ₹${home.price} per night` : 'Price still missing from this listing',
+                                status: home && home.price ? 'Done' : 'Missing',
+                                statusClass: home && home.price ? 'text-emerald-500' : 'text-amber-500'
+                            },
+                            {
+                                icon: '📅',
+                                text: 'Availability settings are not built yet',
+                                status: 'Soon',
+                                statusClass: 'text-gray-300'
+                            }
                         ] %>
-                        <% steps.forEach((step, i) => { %>
+                        <% steps.forEach((step) => { %>
                             <div class="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">
                                 <span class="text-lg"><%= step.icon %></span>
                                 <span class="text-sm text-gray-500"><%= step.text %></span>
-                                <span class="ml-auto text-xs text-gray-300">Soon</span>
+                                <span class="ml-auto text-xs font-medium <%= step.statusClass %>"><%= step.status %></span>
                             </div>
                         <% }) %>
                     </div>
