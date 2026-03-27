@@ -23,11 +23,15 @@
         <% } else { %>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <% homes.forEach(home => { %>
-                    <a href="/homes/<%= home.id %>" class="bg-white rounded-3xl border border-rose-100 p-5 shadow-sm hover:shadow-lg transition-all">
+                    <div class="bg-white rounded-3xl border border-rose-100 p-5 shadow-sm">
                         <p class="text-sm text-rose-400 mb-1"><%= home.homeType || 'Stay' %></p>
                         <h2 class="text-xl font-semibold text-gray-800"><%= home.houseName %></h2>
                         <p class="text-gray-400 mt-1"><%= home.location %></p>
-                    </a>
+                        <div class="mt-4 flex gap-3">
+                            <a href="/homes/<%= home.id %>" class="flex-1 bg-white hover:bg-rose-50 text-rose-500 px-4 py-2 rounded-xl text-sm text-center border border-rose-200">Details</a>
+                            <a href="/reserve/<%= home.id %>" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-xl text-sm text-center">Reserve</a>
+                        </div>
+                    </div>
                 <% }) %>
             </div>
         <% } %>

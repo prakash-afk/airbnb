@@ -8,6 +8,19 @@
     "photo": "https://travel.home.sndimg.com/content/dam/images/travel/fullrights/2016/9/23/0/CI_Airbnb_Utah.jpg.rend.hgtvcom.1280.853.suffix/1491593507925.jpeg",
     "homeType": "Apartment",
     "maxGuests": 2,
-    "availability": "available"
+    "availability": "available",
+    "isFavourite": true
+  },
+  {
+    "id": "f716e4bb-b57d-4824-be9c-8e2626374e58",
+    "houseName": "Resort",
+    "price": 45,
+    "location": "Shimla",
+    "rating": 5,
+    "photo": "https://travel.home.sndimg.com/content/dam/images/travel/fullrights/2016/9/23/0/CI_Airbnb_Utah.jpg.rend.hgtvcom.1280.853.suffix/1491593507925.jpeg",
+    "homeType": "Farm",
+    "maxGuests": 2,
+    "availability": "available",
+    "isFavourite": false
   }
 ]

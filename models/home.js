@@ -5,7 +5,7 @@ const { randomUUID } = require('crypto');
 const homesDataPath = path.join(__dirname, '..', 'data', 'homes.json');
 
 module.exports = class Home {
-  constructor(houseName, price, location, rating, photo, homeType, maxGuests, availability, id = randomUUID()) {
+  constructor(houseName, price, location, rating, photo, homeType, maxGuests, availability, id = randomUUID(), isFavourite = false) {
     this.id = id;
     this.houseName = houseName?.trim();
     this.price = price === '' || price === undefined || price === null ? null : Number(price);
@@ -15,6 +15,7 @@ module.exports = class Home {
     this.homeType = homeType?.trim();
     this.maxGuests = maxGuests === '' || maxGuests === undefined || maxGuests === null ? 1 : Number(maxGuests);
     this.availability = availability === 'unavailable' ? 'unavailable' : 'available';
+    this.isFavourite = Boolean(isFavourite);
   }
 
   save(callback) {
@@ -104,6 +105,7 @@ module.exports = class Home {
       homeType: home.homeType?.trim() || '',
       maxGuests: home.maxGuests === '' || home.maxGuests === undefined || home.maxGuests === null ? 1 : Number(home.maxGuests),
       availability: home.availability === 'unavailable' ? 'unavailable' : 'available',
+      isFavourite: Boolean(home.isFavourite),
     };
   }
 
@@ -170,6 +172,32 @@ module.exports = class Home {
 
       const home = homes.find((item) => item.id === homeId) || null;
       callback(null, home);
+    });
+  }
+
+  static updateFavouriteStatus(homeId, isFavourite, callback) {
+    Home.fetchAll((error, homes) => {
+      if (error) {
+        callback(error);
+        return;
+      }
+
+      const homeIndex = homes.findIndex((item) => item.id === homeId);
+      if (homeIndex === -1) {
+        callback(null, null);
+        return;
+      }
+
+      homes[homeIndex].isFavourite = Boolean(isFavourite);
+
+      Home.writeAll(homes, (writeError) => {
+        if (writeError) {
+          callback(writeError);
+          return;
+        }
+
+        callback(null, homes[homeIndex]);
+      });
     });
   }
 };

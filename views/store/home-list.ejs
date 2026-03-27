@@ -129,8 +129,13 @@
                                 <% } %>
 
                                 <%# Wishlist button %>
-                                <button class="wishlist-btn absolute top-3 right-3 text-gray-300 text-xl bg-white/90 w-8 h-8 rounded-full flex items-center justify-center shadow-sm">
-                                    ♡
+                                <button
+                                    class="wishlist-btn absolute top-3 right-3 text-gray-300 text-xl bg-white/90 w-8 h-8 rounded-full flex items-center justify-center shadow-sm <%= home.isFavourite ? 'active' : '' %>"
+                                    data-home-id="<%= home.id %>"
+                                    data-is-favourite="<%= home.isFavourite ? 'true' : 'false' %>"
+                                    aria-label="Toggle favourite"
+                                >
+                                    <%= home.isFavourite ? '♥' : '♡' %>
                                 </button>
                             </div>
 
@@ -202,9 +207,30 @@
     <script>
         // Wishlist toggle
         document.querySelectorAll('.wishlist-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                btn.classList.toggle('active');
-                btn.innerHTML = btn.classList.contains('active') ? '&hearts;' : '&#9825;';
+            btn.addEventListener('click', async () => {
+                const currentState = btn.dataset.isFavourite === 'true';
+                const nextState = !currentState;
+                const homeId = btn.dataset.homeId;
+
+                try {
+                    const response = await fetch(`/favourites/${homeId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ isFavourite: nextState }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Could not update favourite status.');
+                    }
+
+                    btn.dataset.isFavourite = String(nextState);
+                    btn.classList.toggle('active', nextState);
+                    btn.textContent = nextState ? '♥' : '♡';
+                } catch (error) {
+                    alert('Could not update favourite. Please try again.');
+                }
             });
         });
     </script>

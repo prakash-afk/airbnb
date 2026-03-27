@@ -36,7 +36,7 @@ exports.getFavouriteList = (req, res, next) => {
     }
 
     res.render('store/favourite-list', {
-      homes: homes.slice(0, 3),
+      homes: homes.filter((home) => home.isFavourite),
     });
   });
 };
@@ -66,6 +66,25 @@ exports.getBookings = (req, res, next) => {
 
     res.render('store/bookings', {
       homes: homes.slice(0, 5),
+    });
+  });
+};
+
+exports.toggleFavourite = (req, res, next) => {
+  Home.updateFavouriteStatus(req.params.homeId, req.body.isFavourite, (error, home) => {
+    if (error) {
+      next(error);
+      return;
+    }
+
+    if (!home) {
+      res.status(404).json({ message: 'Home not found.' });
+      return;
+    }
+
+    res.status(200).json({
+      message: 'Favourite status updated.',
+      home,
     });
   });
 };
