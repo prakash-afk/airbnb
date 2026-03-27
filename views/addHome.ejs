@@ -187,6 +187,21 @@
                         </div>
                     </div>
 
+                    <%# Availability %>
+                    <div class="fade-up" style="animation-delay:0.43s">
+                        <label class="block text-sm font-medium text-gray-600 mb-2">Availability</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-gray-700">
+                                <input type="radio" name="availability" value="available" checked class="accent-rose-500">
+                                <span>Available for booking</span>
+                            </label>
+                            <label class="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700">
+                                <input type="radio" name="availability" value="unavailable" class="accent-rose-500">
+                                <span>Not available right now</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <%# Submit %>
                     <div class="fade-up pt-2" style="animation-delay:0.45s">
                         <button type="submit"

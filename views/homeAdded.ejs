@@ -122,9 +122,11 @@
                             },
                             {
                                 icon: '📅',
-                                text: 'Availability settings are not built yet',
-                                status: 'Soon',
-                                statusClass: 'text-gray-300'
+                                text: home && home.availability === 'unavailable'
+                                    ? 'Listing saved as unavailable right now'
+                                    : 'Listing saved as available for booking',
+                                status: 'Done',
+                                statusClass: 'text-emerald-500'
                             }
                         ] %>
                         <% steps.forEach((step) => { %>

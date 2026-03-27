@@ -12,7 +12,8 @@ exports.postAddHome = (req, res) => {
     req.body.rating,
     req.body.photo,
     req.body.homeType,
-    req.body.maxGuests
+    req.body.maxGuests,
+    req.body.availability
   ).save();
 
   console.log('Home registered successfully:', newHome);

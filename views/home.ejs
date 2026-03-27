@@ -59,7 +59,7 @@
             <div class="flex items-center justify-between mb-6">
                 <p class="text-sm text-gray-400">
                     <span class="font-semibold text-gray-600"><%= registerHome.length %></span>
-                    home<%= registerHome.length !== 1 ? 's' : '' %> available
+                    home listing<%= registerHome.length !== 1 ? 's' : '' %>
                 </p>
                 <a href="/host/add-home"
                    class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-medium px-4 py-2 rounded-full transition-all shadow">
@@ -136,7 +136,9 @@
                                     <% } else { %>
                                         <p class="text-gray-400 text-xs">Price not set</p>
                                     <% } %>
-                                    <span class="bg-rose-50 text-rose-400 text-xs px-2.5 py-1 rounded-full">Available</span>
+                                    <span class="<%= home.availability === 'available' ? 'bg-rose-50 text-rose-400' : 'bg-gray-100 text-gray-500' %> text-xs px-2.5 py-1 rounded-full">
+                                        <%= home.availability === 'available' ? 'Available' : 'Unavailable' %>
+                                    </span>
                                 </div>
 
                             </div>
