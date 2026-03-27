@@ -160,4 +160,16 @@ module.exports = class Home {
       }
     });
   }
+
+  static fetchById(homeId, callback) {
+    Home.fetchAll((error, homes) => {
+      if (error) {
+        callback(error);
+        return;
+      }
+
+      const home = homes.find((item) => item.id === homeId) || null;
+      callback(null, home);
+    });
+  }
 };

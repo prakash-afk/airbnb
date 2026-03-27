@@ -42,5 +42,16 @@
     "homeType": "Beach House",
     "maxGuests": 1,
     "availability": "available"
+  },
+  {
+    "id": "3f7ae19e-1bc1-4ad1-9f07-7f78d4ef732d",
+    "houseName": "Sunita Sadan",
+    "price": 12,
+    "location": "Patna",
+    "rating": 5,
+    "photo": "https://travel.home.sndimg.com/content/dam/images/travel/fullrights/2016/9/23/0/CI_Airbnb_Utah.jpg.rend.hgtvcom.1280.853.suffix/1491593507925.jpeg",
+    "homeType": "",
+    "maxGuests": 1,
+    "availability": "available"
   }
 ]

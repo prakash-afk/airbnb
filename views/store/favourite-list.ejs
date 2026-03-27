@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favourite Homes</title>
+    <link rel="stylesheet" href="/output.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>body{font-family:'DM Sans',sans-serif}.brand{font-family:'Pacifico',cursive}</style>
+</head>
+<body class="bg-rose-50 min-h-screen">
+    <header class="bg-white border-b border-rose-100 shadow-sm">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" class="brand text-rose-500 text-2xl">airbnb</a>
+            <a href="/" class="text-sm text-gray-400 hover:text-rose-500">Back to listings</a>
+        </div>
+    </header>
+    <main class="max-w-5xl mx-auto px-6 py-10">
+        <h1 class="text-3xl font-semibold text-gray-800 mb-2">Favourite List</h1>
+        <p class="text-gray-400 mb-8">A simple store view for homes the user wants to revisit.</p>
+        <% if (!homes.length) { %>
+            <div class="bg-white rounded-3xl border border-rose-100 p-8 text-gray-500">No favourite homes yet.</div>
+        <% } else { %>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <% homes.forEach(home => { %>
+                    <a href="/homes/<%= home.id %>" class="bg-white rounded-3xl border border-rose-100 p-5 shadow-sm hover:shadow-lg transition-all">
+                        <p class="text-sm text-rose-400 mb-1"><%= home.homeType || 'Stay' %></p>
+                        <h2 class="text-xl font-semibold text-gray-800"><%= home.houseName %></h2>
+                        <p class="text-gray-400 mt-1"><%= home.location %></p>
+                    </a>
+                <% }) %>
+            </div>
+        <% } %>
+    </main>
+</body>
+</html>

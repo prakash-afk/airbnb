@@ -12,7 +12,7 @@ const defaultFormData = {
 };
 
 exports.getAddHome = (req, res) => {
-  res.render('addHome', {
+  res.render('host/addHome', {
     errors: [],
     oldInput: defaultFormData,
   });
@@ -22,7 +22,7 @@ exports.postAddHome = (req, res, next) => {
   const validationErrors = Home.validate(req.body);
 
   if (validationErrors.length > 0) {
-    res.status(422).render('addHome', {
+    res.status(422).render('host/addHome', {
       errors: validationErrors,
       oldInput: {
         houseName: req.body.houseName || '',
@@ -56,9 +56,36 @@ exports.postAddHome = (req, res, next) => {
     }
 
     console.log('Home registered successfully:', savedHome);
-    res.render('homeAdded', {
+    res.render('host/homeAdded', {
       houseName: savedHome.houseName,
       home: savedHome,
     });
+  });
+};
+
+exports.getHostHomeList = (req, res, next) => {
+  Home.fetchAll((error, homes) => {
+    if (error) {
+      next(error);
+      return;
+    }
+
+    res.render('host/host-home-list', { homes });
+  });
+};
+
+exports.getEditHome = (req, res, next) => {
+  Home.fetchById(req.params.homeId, (error, home) => {
+    if (error) {
+      next(error);
+      return;
+    }
+
+    if (!home) {
+      res.status(404).render('404');
+      return;
+    }
+
+    res.render('host/edit-home', { home });
   });
 };

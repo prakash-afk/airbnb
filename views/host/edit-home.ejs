@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit <%= home.houseName %></title>
+    <link rel="stylesheet" href="/output.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>body{font-family:'DM Sans',sans-serif}.brand{font-family:'Pacifico',cursive}</style>
+</head>
+<body class="bg-rose-50 min-h-screen">
+    <header class="bg-white border-b border-rose-100 shadow-sm">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" class="brand text-rose-500 text-2xl">airbnb</a>
+            <a href="/host/homes" class="text-sm text-gray-400 hover:text-rose-500">Back to host homes</a>
+        </div>
+    </header>
+    <main class="max-w-4xl mx-auto px-6 py-10">
+        <div class="bg-white rounded-3xl border border-rose-100 shadow-xl p-8">
+            <p class="text-sm text-rose-400 font-medium mb-2">Edit View</p>
+            <h1 class="text-3xl font-semibold text-gray-800 mb-6">Edit <%= home.houseName %></h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="rounded-2xl bg-rose-50 px-4 py-3">
+                    <p class="text-gray-400 text-sm">Home ID</p>
+                    <p class="text-gray-800 font-medium break-all"><%= home.id %></p>
+                </div>
+                <div class="rounded-2xl bg-rose-50 px-4 py-3">
+                    <p class="text-gray-400 text-sm">Availability</p>
+                    <p class="text-gray-800 font-medium capitalize"><%= home.availability %></p>
+                </div>
+                <div class="rounded-2xl bg-rose-50 px-4 py-3">
+                    <p class="text-gray-400 text-sm">Price</p>
+                    <p class="text-gray-800 font-medium"><%= home.price ? `Rs ${home.price}` : 'Not set' %></p>
+                </div>
+                <div class="rounded-2xl bg-rose-50 px-4 py-3">
+                    <p class="text-gray-400 text-sm">Guests</p>
+                    <p class="text-gray-800 font-medium"><%= home.maxGuests %></p>
+                </div>
+            </div>
+            <p class="text-gray-500 mt-6">This host edit page is now structured and ready for real update functionality in the next step.</p>
+        </div>
+    </main>
+</body>
+</html>
