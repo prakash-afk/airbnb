@@ -1,11 +1,8 @@
-const { MongoClient } = require('mongodb');
-
-let client;
-let database;
+const mongoose = require('mongoose');
 
 async function connectToMongo() {
-  if (database) {
-    return database;
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
   }
 
   const mongoUri = process.env.MONGODB_URI;
@@ -15,22 +12,23 @@ async function connectToMongo() {
     throw new Error('Missing MONGODB_URI. Add it to your environment before starting the app.');
   }
 
-  client = new MongoClient(mongoUri);
-  await client.connect();
-  database = client.db(dbName);
+  await mongoose.connect(mongoUri, {
+    dbName,
+  });
 
-  return database;
+  return mongoose.connection;
 }
 
 function getDb() {
-  if (!database) {
+  if (mongoose.connection.readyState !== 1) {
     throw new Error('MongoDB is not connected yet.');
   }
 
-  return database;
+  return mongoose.connection;
 }
 
 module.exports = {
   connectToMongo,
   getDb,
+  mongoose,
 };

@@ -1,6 +1,68 @@
 const { randomUUID } = require('crypto');
 
-const { getDb } = require('../config/mongo');
+const { mongoose } = require('../config/mongo');
+
+const allowedHomeTypes = ['House', 'Apartment', 'Cabin', 'Beach House', 'Farm', 'Villa'];
+const allowedAvailability = ['available', 'unavailable'];
+const textPattern = /^(?=.*[A-Za-z])[A-Za-z0-9\s,.'-]+$/;
+
+const homeSchema = new mongoose.Schema(
+  {
+    id: {
+      type: String,
+      default: randomUUID,
+      required: true,
+      unique: true,
+    },
+    houseName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    location: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    rating: {
+      type: Number,
+      default: 0,
+    },
+    photo: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    homeType: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    maxGuests: {
+      type: Number,
+      default: 1,
+    },
+    availability: {
+      type: String,
+      enum: allowedAvailability,
+      default: 'available',
+    },
+    isFavourite: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    versionKey: false,
+    timestamps: true,
+  }
+);
+
+const HomeDocument = mongoose.models.Home || mongoose.model('Home', homeSchema, 'homes');
 
 module.exports = class Home {
   constructor(houseName, price, location, rating, photo, homeType, maxGuests, availability, id = randomUUID(), isFavourite = false) {
@@ -17,14 +79,23 @@ module.exports = class Home {
   }
 
   save(callback) {
-    Home.getCollection()
-      .insertOne(this)
-      .then(() => callback(null, this))
-      .catch((error) => callback(error));
-  }
+    const homeDocument = new HomeDocument({
+      id: this.id,
+      houseName: this.houseName,
+      price: this.price,
+      location: this.location,
+      rating: this.rating,
+      photo: this.photo,
+      homeType: this.homeType,
+      maxGuests: this.maxGuests,
+      availability: this.availability,
+      isFavourite: this.isFavourite,
+    });
 
-  static getCollection() {
-    return getDb().collection('homes');
+    homeDocument
+      .save()
+      .then((savedHome) => callback(null, Home.normalizeHome(savedHome.toObject())))
+      .catch((error) => callback(error));
   }
 
   static validate(homePayload) {
@@ -35,9 +106,6 @@ module.exports = class Home {
     const price = Number(homePayload.price);
     const rating = Number(homePayload.rating);
     const maxGuests = Number(homePayload.maxGuests);
-    const allowedHomeTypes = ['House', 'Apartment', 'Cabin', 'Beach House', 'Farm', 'Villa'];
-    const allowedAvailability = ['available', 'unavailable'];
-    const textPattern = /^(?=.*[A-Za-z])[A-Za-z0-9\s,.'-]+$/;
 
     if (!houseName) {
       errors.push('Home name is required.');
@@ -100,45 +168,30 @@ module.exports = class Home {
   }
 
   static fetchAll(callback) {
-    Home.getCollection()
-      .find({})
-      .sort({ _id: 1 })
-      .toArray()
+    HomeDocument.find()
+      .sort({ createdAt: 1, _id: 1 })
+      .lean()
       .then((homes) => callback(null, homes.map((home) => Home.normalizeHome(home))))
       .catch((error) => callback(error));
   }
 
   static fetchById(homeId, callback) {
-    Home.getCollection()
-      .findOne({ id: homeId })
+    HomeDocument.findOne({ id: homeId })
+      .lean()
       .then((home) => callback(null, home ? Home.normalizeHome(home) : null))
       .catch((error) => callback(error));
   }
 
   static updateFavouriteStatus(homeId, isFavourite, callback) {
-    Home.getCollection()
-      .updateOne({ id: homeId }, { $set: { isFavourite: Boolean(isFavourite) } })
-      .then((result) => {
-        if (!result.matchedCount) {
-          callback(null, null);
-          return null;
-        }
-
-        return Home.getCollection().findOne({ id: homeId });
-      })
-      .then((home) => {
-        if (home === null || home === undefined) {
-          return;
-        }
-
-        callback(null, Home.normalizeHome(home));
-      })
+    HomeDocument.findOneAndUpdate({ id: homeId }, { isFavourite: Boolean(isFavourite) }, { new: true })
+      .lean()
+      .then((home) => callback(null, home ? Home.normalizeHome(home) : null))
       .catch((error) => callback(error));
   }
 
   static updateById(homeId, homePayload, callback) {
-    Home.getCollection()
-      .findOne({ id: homeId })
+    HomeDocument.findOne({ id: homeId })
+      .lean()
       .then((existingHome) => {
         if (!existingHome) {
           callback(null, null);
@@ -158,37 +211,24 @@ module.exports = class Home {
           existingHome.isFavourite
         );
 
-        return Home.getCollection()
-          .updateOne(
-            { id: homeId },
-            {
-              $set: {
-                houseName: updatedHome.houseName,
-                price: updatedHome.price,
-                location: updatedHome.location,
-                rating: updatedHome.rating,
-                photo: updatedHome.photo,
-                homeType: updatedHome.homeType,
-                maxGuests: updatedHome.maxGuests,
-                availability: updatedHome.availability,
-                isFavourite: updatedHome.isFavourite,
-              },
-            }
-          )
-          .then((result) => {
-            if (!result.matchedCount) {
-              callback(null, null);
-              return null;
-            }
-
-            return Home.getCollection().findOne({ id: homeId });
-          })
+        return HomeDocument.findOneAndUpdate(
+          { id: homeId },
+          {
+            houseName: updatedHome.houseName,
+            price: updatedHome.price,
+            location: updatedHome.location,
+            rating: updatedHome.rating,
+            photo: updatedHome.photo,
+            homeType: updatedHome.homeType,
+            maxGuests: updatedHome.maxGuests,
+            availability: updatedHome.availability,
+            isFavourite: updatedHome.isFavourite,
+          },
+          { new: true }
+        )
+          .lean()
           .then((home) => {
-            if (home === null || home === undefined) {
-              return;
-            }
-
-            callback(null, Home.normalizeHome(home));
+            callback(null, home ? Home.normalizeHome(home) : null);
           });
       })
       .catch((error) => callback(error));
