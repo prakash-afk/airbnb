@@ -145,10 +145,14 @@ exports.postDeleteHome = (req, res, next) => {
     }
 
     if (!deletedHome) {
-      res.status(404).render('404');
+      res.redirect(303, '/host/homes');
       return;
     }
 
-    res.redirect('/host/homes');
+    res.redirect(303, '/host/homes');
   });
+};
+
+exports.getDeleteHomeFallback = (req, res) => {
+  res.redirect(303, '/host/homes');
 };
