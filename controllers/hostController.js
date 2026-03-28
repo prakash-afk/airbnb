@@ -11,6 +11,19 @@ const defaultFormData = {
   availability: 'available',
 };
 
+function buildFormData(body) {
+  return {
+    houseName: body.houseName || '',
+    location: body.location || '',
+    price: body.price || '',
+    photo: body.photo || '',
+    rating: body.rating || '0',
+    homeType: body.homeType || '',
+    maxGuests: body.maxGuests || '2',
+    availability: body.availability || 'available',
+  };
+}
+
 exports.getAddHome = (req, res) => {
   res.render('host/addHome', {
     errors: [],
@@ -24,16 +37,7 @@ exports.postAddHome = (req, res, next) => {
   if (validationErrors.length > 0) {
     res.status(422).render('host/addHome', {
       errors: validationErrors,
-      oldInput: {
-        houseName: req.body.houseName || '',
-        location: req.body.location || '',
-        price: req.body.price || '',
-        photo: req.body.photo || '',
-        rating: req.body.rating || '0',
-        homeType: req.body.homeType || '',
-        maxGuests: req.body.maxGuests || '2',
-        availability: req.body.availability || 'available',
-      },
+      oldInput: buildFormData(req.body),
     });
     return;
   }
@@ -86,6 +90,49 @@ exports.getEditHome = (req, res, next) => {
       return;
     }
 
-    res.render('host/edit-home', { home });
+    res.render('host/edit-home', {
+      home,
+      errors: [],
+      oldInput: buildFormData(home),
+    });
+  });
+};
+
+exports.postEditHome = (req, res, next) => {
+  const validationErrors = Home.validate(req.body);
+
+  if (validationErrors.length > 0) {
+    Home.fetchById(req.params.homeId, (error, home) => {
+      if (error) {
+        next(error);
+        return;
+      }
+
+      if (!home) {
+        res.status(404).render('404');
+        return;
+      }
+
+      res.status(422).render('host/edit-home', {
+        home,
+        errors: validationErrors,
+        oldInput: buildFormData(req.body),
+      });
+    });
+    return;
+  }
+
+  Home.updateById(req.params.homeId, req.body, (error, updatedHome) => {
+    if (error) {
+      next(error);
+      return;
+    }
+
+    if (!updatedHome) {
+      res.status(404).render('404');
+      return;
+    }
+
+    res.redirect(`/homes/${updatedHome.id}`);
   });
 };

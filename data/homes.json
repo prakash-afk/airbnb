@@ -1,14 +1,14 @@
 [
   {
     "id": "43a27d09-0215-428b-958f-acb31d65f240",
-    "houseName": "Sunita Sadan",
-    "price": 26,
-    "location": "Patna",
-    "rating": 5,
-    "photo": "https://travel.home.sndimg.com/content/dam/images/travel/fullrights/2016/9/23/0/CI_Airbnb_Utah.jpg.rend.hgtvcom.1280.853.suffix/1491593507925.jpeg",
-    "homeType": "Apartment",
-    "maxGuests": 2,
-    "availability": "available",
+    "houseName": "Edited Stay",
+    "price": 9999,
+    "location": "Goa",
+    "rating": 4,
+    "photo": "https://example.com/edited.jpg",
+    "homeType": "Villa",
+    "maxGuests": 5,
+    "availability": "unavailable",
     "isFavourite": false
   },
   {
@@ -21,7 +21,7 @@
     "homeType": "Farm",
     "maxGuests": 2,
     "availability": "available",
-    "isFavourite": false
+    "isFavourite": true
   },
   {
     "id": "9958001c-f137-4155-9084-787896094c46",

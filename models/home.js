@@ -200,4 +200,44 @@ module.exports = class Home {
       });
     });
   }
+
+  static updateById(homeId, homePayload, callback) {
+    Home.fetchAll((error, homes) => {
+      if (error) {
+        callback(error);
+        return;
+      }
+
+      const homeIndex = homes.findIndex((item) => item.id === homeId);
+      if (homeIndex === -1) {
+        callback(null, null);
+        return;
+      }
+
+      const existingHome = homes[homeIndex];
+      const updatedHome = new Home(
+        homePayload.houseName,
+        homePayload.price,
+        homePayload.location,
+        homePayload.rating,
+        homePayload.photo,
+        homePayload.homeType,
+        homePayload.maxGuests,
+        homePayload.availability,
+        existingHome.id,
+        existingHome.isFavourite
+      );
+
+      homes[homeIndex] = updatedHome;
+
+      Home.writeAll(homes, (writeError) => {
+        if (writeError) {
+          callback(writeError);
+          return;
+        }
+
+        callback(null, updatedHome);
+      });
+    });
+  }
 };
