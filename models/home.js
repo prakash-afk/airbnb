@@ -233,4 +233,11 @@ module.exports = class Home {
       })
       .catch((error) => callback(error));
   }
+
+  static deleteById(homeId, callback) {
+    HomeDocument.findOneAndDelete({ id: homeId })
+      .lean()
+      .then((deletedHome) => callback(null, deletedHome ? Home.normalizeHome(deletedHome) : null))
+      .catch((error) => callback(error));
+  }
 };

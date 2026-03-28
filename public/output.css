@@ -1072,6 +1072,10 @@ video {
   background-color: rgb(255 251 235 / 0.4);
 }
 
+.bg-rose-50\/60 {
+  background-color: rgb(255 241 242 / 0.6);
+}
+
 .bg-gradient-to-br {
   background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
 }
@@ -1263,6 +1267,10 @@ video {
 
 .pl-5 {
   padding-left: 1.25rem;
+}
+
+.pb-8 {
+  padding-bottom: 2rem;
 }
 
 .text-center {
@@ -1529,6 +1537,11 @@ video {
 .hover\:bg-rose-600:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(225 29 72 / var(--tw-bg-opacity, 1));
+}
+
+.hover\:bg-rose-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 228 230 / var(--tw-bg-opacity, 1));
 }
 
 .hover\:text-rose-400:hover {

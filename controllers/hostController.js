@@ -136,3 +136,19 @@ exports.postEditHome = (req, res, next) => {
     res.redirect(`/homes/${updatedHome.id}`);
   });
 };
+
+exports.postDeleteHome = (req, res, next) => {
+  Home.deleteById(req.params.homeId, (error, deletedHome) => {
+    if (error) {
+      next(error);
+      return;
+    }
+
+    if (!deletedHome) {
+      res.status(404).render('404');
+      return;
+    }
+
+    res.redirect('/host/homes');
+  });
+};
