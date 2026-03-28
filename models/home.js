@@ -1,8 +1,6 @@
-const fs = require('fs');
-const path = require('path');
 const { randomUUID } = require('crypto');
 
-const homesDataPath = path.join(__dirname, '..', 'data', 'homes.json');
+const { getDb } = require('../config/mongo');
 
 module.exports = class Home {
   constructor(houseName, price, location, rating, photo, homeType, maxGuests, availability, id = randomUUID(), isFavourite = false) {
@@ -19,22 +17,14 @@ module.exports = class Home {
   }
 
   save(callback) {
-    Home.fetchAll((readError, registeredHomes) => {
-      if (readError) {
-        callback(readError);
-        return;
-      }
+    Home.getCollection()
+      .insertOne(this)
+      .then(() => callback(null, this))
+      .catch((error) => callback(error));
+  }
 
-      registeredHomes.push(this);
-      Home.writeAll(registeredHomes, (writeError) => {
-        if (writeError) {
-          callback(writeError);
-          return;
-        }
-
-        callback(null, this);
-      });
-    });
+  static getCollection() {
+    return getDb().collection('homes');
   }
 
   static validate(homePayload) {
@@ -109,135 +99,98 @@ module.exports = class Home {
     };
   }
 
-  static writeAll(homes, callback) {
-    fs.mkdir(path.dirname(homesDataPath), { recursive: true }, (mkdirError) => {
-      if (mkdirError) {
-        callback(mkdirError);
-        return;
-      }
-
-      fs.writeFile(homesDataPath, JSON.stringify(homes, null, 2), callback);
-    });
-  }
-
   static fetchAll(callback) {
-    fs.readFile(homesDataPath, 'utf8', (error, fileContent) => {
-      if (error) {
-        if (error.code === 'ENOENT') {
-          callback(null, []);
-          return;
-        }
-
-        callback(error);
-        return;
-      }
-
-      if (!fileContent.trim()) {
-        callback(null, []);
-        return;
-      }
-
-      try {
-        const homes = JSON.parse(fileContent);
-        const normalizedHomes = Array.isArray(homes) ? homes.map((home) => Home.normalizeHome(home)) : [];
-        const needsRewrite = normalizedHomes.some((home, index) => !homes[index]?.id);
-
-        if (!needsRewrite) {
-          callback(null, normalizedHomes);
-          return;
-        }
-
-        Home.writeAll(normalizedHomes, (writeError) => {
-          if (writeError) {
-            callback(writeError);
-            return;
-          }
-
-          callback(null, normalizedHomes);
-        });
-      } catch (parseError) {
-        const invalidJsonError = new Error('Could not read saved homes because homes.json contains invalid JSON.');
-        invalidJsonError.cause = parseError;
-        callback(invalidJsonError);
-      }
-    });
+    Home.getCollection()
+      .find({})
+      .sort({ _id: 1 })
+      .toArray()
+      .then((homes) => callback(null, homes.map((home) => Home.normalizeHome(home))))
+      .catch((error) => callback(error));
   }
 
   static fetchById(homeId, callback) {
-    Home.fetchAll((error, homes) => {
-      if (error) {
-        callback(error);
-        return;
-      }
-
-      const home = homes.find((item) => item.id === homeId) || null;
-      callback(null, home);
-    });
+    Home.getCollection()
+      .findOne({ id: homeId })
+      .then((home) => callback(null, home ? Home.normalizeHome(home) : null))
+      .catch((error) => callback(error));
   }
 
   static updateFavouriteStatus(homeId, isFavourite, callback) {
-    Home.fetchAll((error, homes) => {
-      if (error) {
-        callback(error);
-        return;
-      }
+    Home.getCollection()
+      .updateOne({ id: homeId }, { $set: { isFavourite: Boolean(isFavourite) } })
+      .then((result) => {
+        if (!result.matchedCount) {
+          callback(null, null);
+          return null;
+        }
 
-      const homeIndex = homes.findIndex((item) => item.id === homeId);
-      if (homeIndex === -1) {
-        callback(null, null);
-        return;
-      }
-
-      homes[homeIndex].isFavourite = Boolean(isFavourite);
-
-      Home.writeAll(homes, (writeError) => {
-        if (writeError) {
-          callback(writeError);
+        return Home.getCollection().findOne({ id: homeId });
+      })
+      .then((home) => {
+        if (home === null || home === undefined) {
           return;
         }
 
-        callback(null, homes[homeIndex]);
-      });
-    });
+        callback(null, Home.normalizeHome(home));
+      })
+      .catch((error) => callback(error));
   }
 
   static updateById(homeId, homePayload, callback) {
-    Home.fetchAll((error, homes) => {
-      if (error) {
-        callback(error);
-        return;
-      }
-
-      const homeIndex = homes.findIndex((item) => item.id === homeId);
-      if (homeIndex === -1) {
-        callback(null, null);
-        return;
-      }
-
-      const existingHome = homes[homeIndex];
-      const updatedHome = new Home(
-        homePayload.houseName,
-        homePayload.price,
-        homePayload.location,
-        homePayload.rating,
-        homePayload.photo,
-        homePayload.homeType,
-        homePayload.maxGuests,
-        homePayload.availability,
-        existingHome.id,
-        existingHome.isFavourite
-      );
-
-      homes[homeIndex] = updatedHome;
-
-      Home.writeAll(homes, (writeError) => {
-        if (writeError) {
-          callback(writeError);
-          return;
+    Home.getCollection()
+      .findOne({ id: homeId })
+      .then((existingHome) => {
+        if (!existingHome) {
+          callback(null, null);
+          return null;
         }
 
-        callback(null, updatedHome);
-      });
-    });
+        const updatedHome = new Home(
+          homePayload.houseName,
+          homePayload.price,
+          homePayload.location,
+          homePayload.rating,
+          homePayload.photo,
+          homePayload.homeType,
+          homePayload.maxGuests,
+          homePayload.availability,
+          existingHome.id,
+          existingHome.isFavourite
+        );
+
+        return Home.getCollection()
+          .updateOne(
+            { id: homeId },
+            {
+              $set: {
+                houseName: updatedHome.houseName,
+                price: updatedHome.price,
+                location: updatedHome.location,
+                rating: updatedHome.rating,
+                photo: updatedHome.photo,
+                homeType: updatedHome.homeType,
+                maxGuests: updatedHome.maxGuests,
+                availability: updatedHome.availability,
+                isFavourite: updatedHome.isFavourite,
+              },
+            }
+          )
+          .then((result) => {
+            if (!result.matchedCount) {
+              callback(null, null);
+              return null;
+            }
+
+            return Home.getCollection().findOne({ id: homeId });
+          })
+          .then((home) => {
+            if (home === null || home === undefined) {
+              return;
+            }
+
+            callback(null, Home.normalizeHome(home));
+          });
+      })
+      .catch((error) => callback(error));
   }
 };
