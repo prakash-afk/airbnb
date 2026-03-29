@@ -45,6 +45,12 @@ app.use(
 app.use((req, res, next) => {
   res.locals.isLoggedIn = Boolean(req.session?.isLoggedIn);
   res.locals.currentUser = req.session?.user || null;
+  res.locals.flash = req.session?.flash || null;
+
+  if (req.session?.flash) {
+    delete req.session.flash;
+  }
+
   next();
 });
 

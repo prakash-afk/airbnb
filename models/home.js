@@ -131,7 +131,10 @@ module.exports = class Home {
     const location = homePayload.location?.trim();
     const photo = homePayload.photo?.trim();
     const price = Number(homePayload.price);
-    const rating = Number(homePayload.rating);
+    const rating =
+      homePayload.rating === '' || homePayload.rating === undefined || homePayload.rating === null
+        ? 0
+        : Number(homePayload.rating);
     const maxGuests = Number(homePayload.maxGuests);
 
     if (!houseName) {

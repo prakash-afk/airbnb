@@ -38,6 +38,8 @@
         </div>
     </header>
 
+    <%- include('../partials/flash') %>
+
     <main class="max-w-4xl mx-auto px-6 py-10">
         <div class="bg-white rounded-3xl border border-rose-100 shadow-xl overflow-hidden">
             <div class="bg-gradient-to-r from-rose-400 to-orange-300 px-8 py-6">
@@ -79,11 +81,6 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-600 mb-1.5">Photo URL</label>
                         <input type="url" name="photo" value="<%= formData.photo %>" class="input-field w-full border border-gray-200 rounded-xl px-4 py-3 text-sm bg-rose-50/30">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1.5">Rating</label>
-                        <input type="number" name="rating" min="0" max="5" step="1" value="<%= formData.rating %>" class="input-field w-full border border-gray-200 rounded-xl px-4 py-3 text-sm bg-rose-50/30">
                     </div>
 
                     <div>

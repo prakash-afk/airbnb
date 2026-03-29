@@ -91,6 +91,8 @@
         </div>
     </header>
 
+    <%- include('../partials/flash') %>
+
     <% const isHostUser = currentUser && currentUser.userType === 'host'; %>
     <% const isGuestUser = currentUser && currentUser.userType === 'guest'; %>
 
@@ -201,7 +203,7 @@
                                     <h3 class="font-semibold text-gray-800 text-base leading-tight line-clamp-1">
                                         <%= home.houseName %>
                                     </h3>
-                                    <% if (home.rating && home.rating > 0) { %>
+                                    <% if (!isHostUser && home.rating && home.rating > 0) { %>
                                         <span class="flex items-center gap-0.5 text-sm text-gray-700 shrink-0">
                                             <span class="text-rose-400">★</span>
                                             <%= home.rating %>
@@ -243,10 +245,12 @@
                                        class="flex-1 bg-white hover:bg-rose-50 text-rose-500 text-xs font-medium px-3 py-2 rounded-xl text-center border border-rose-200 transition-all">
                                         Details
                                     </a>
-                                    <a href="/reserve/<%= home.id %>"
-                                       class="flex-1 bg-rose-500 hover:bg-rose-600 text-white text-xs font-medium px-3 py-2 rounded-xl text-center transition-all">
-                                        Reserve
-                                    </a>
+                                    <% if (!isHostUser) { %>
+                                        <a href="/reserve/<%= home.id %>"
+                                           class="flex-1 bg-rose-500 hover:bg-rose-600 text-white text-xs font-medium px-3 py-2 rounded-xl text-center transition-all">
+                                            Reserve
+                                        </a>
+                                    <% } %>
                                 </div>
 
                             </div>

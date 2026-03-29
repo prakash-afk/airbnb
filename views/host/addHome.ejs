@@ -28,8 +28,6 @@
             from { opacity: 0; transform: scale(0.96); }
             to { opacity: 1; transform: scale(1); }
         }
-        .star { cursor: pointer; transition: transform 0.1s; }
-        .star:hover { transform: scale(1.2); }
         .field-warning {
             min-height: 1.25rem;
             transition: opacity 0.2s ease;
@@ -45,7 +43,6 @@
         location: '',
         price: '',
         photo: '',
-        rating: '0',
         homeType: '',
         maxGuests: '2',
         availability: 'available'
@@ -67,6 +64,8 @@
             </nav>
         </div>
     </header>
+
+    <%- include('../partials/flash') %>
 
     <div class="bg-white border-b border-rose-50">
         <div class="max-w-5xl mx-auto px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -173,19 +172,6 @@
                         <div id="imgPreviewBox" class="hidden mt-2 rounded-xl overflow-hidden border border-rose-100 h-36">
                             <img id="imgPreview" src="" alt="Preview" class="w-full h-full object-cover">
                         </div>
-                    </div>
-
-                    <div class="fade-up" style="animation-delay:0.3s">
-                        <label class="block text-sm font-medium text-gray-600 mb-2">Rating</label>
-                        <div class="flex items-center gap-2">
-                            <div class="flex gap-1" id="starContainer">
-                                <% for (let i = 1; i <= 5; i++) { %>
-                                    <span class="star text-3xl text-gray-200" data-value="<%= i %>">&#9733;</span>
-                                <% } %>
-                            </div>
-                            <span class="text-sm text-gray-400 ml-2" id="ratingLabel">Not rated</span>
-                        </div>
-                        <input type="hidden" name="rating" id="ratingInput" value="<%= formData.rating %>">
                     </div>
 
                     <div class="fade-up" style="animation-delay:0.35s">
@@ -308,47 +294,6 @@
 
         photoUrl.addEventListener('input', updatePreview);
         updatePreview();
-
-        const stars = document.querySelectorAll('.star');
-        const ratingInput = document.getElementById('ratingInput');
-        const ratingLabel = document.getElementById('ratingLabel');
-        const labels = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'];
-
-        function paintStars(current) {
-            ratingLabel.textContent = labels[current] || 'Not rated';
-            stars.forEach((star) => {
-                const value = parseInt(star.dataset.value);
-                star.classList.toggle('text-rose-400', value <= current);
-                star.classList.toggle('text-gray-200', value > current);
-            });
-        }
-
-        stars.forEach((star) => {
-            star.addEventListener('click', () => {
-                const value = parseInt(star.dataset.value);
-                ratingInput.value = value;
-                paintStars(value);
-            });
-
-            star.addEventListener('mouseenter', () => {
-                const value = parseInt(star.dataset.value);
-                stars.forEach((item) => {
-                    item.classList.toggle('text-rose-300', parseInt(item.dataset.value) <= value);
-                });
-            });
-
-            star.addEventListener('mouseleave', () => {
-                const current = parseInt(ratingInput.value) || 0;
-                stars.forEach((item) => {
-                    const value = parseInt(item.dataset.value);
-                    item.classList.remove('text-rose-300');
-                    item.classList.toggle('text-rose-400', value <= current);
-                    item.classList.toggle('text-gray-200', value > current);
-                });
-            });
-        });
-
-        paintStars(parseInt(ratingInput.value) || 0);
 
         const pills = document.querySelectorAll('.type-pill');
         const homeTypeInput = document.getElementById('homeTypeInput');

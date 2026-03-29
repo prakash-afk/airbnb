@@ -1,11 +1,11 @@
 const Home = require('../models/home');
+const { setFlash } = require('../utils/flash');
 
 const defaultFormData = {
   houseName: '',
   location: '',
   price: '',
   photo: '',
-  rating: '0',
   homeType: '',
   maxGuests: '2',
   availability: 'available',
@@ -17,7 +17,6 @@ function buildFormData(body) {
     location: body.location || '',
     price: body.price || '',
     photo: body.photo || '',
-    rating: body.rating || '0',
     homeType: body.homeType || '',
     maxGuests: body.maxGuests || '2',
     availability: body.availability || 'available',
@@ -54,7 +53,7 @@ exports.postAddHome = (req, res, next) => {
     req.body.houseName,
     req.body.price,
     req.body.location,
-    req.body.rating,
+    0,
     req.body.photo,
     req.body.homeType,
     req.body.maxGuests,
@@ -103,6 +102,7 @@ exports.getEditHome = (req, res, next) => {
     }
 
     if (!isHostAuthorizedForHome(home, req.session.user)) {
+      setFlash(req, 'error', 'You can only edit homes from your own host dashboard.');
       res.redirect('/host/homes');
       return;
     }
@@ -131,6 +131,7 @@ exports.postEditHome = (req, res, next) => {
       }
 
       if (!isHostAuthorizedForHome(home, req.session.user)) {
+        setFlash(req, 'error', 'You can only edit homes from your own host dashboard.');
         res.redirect('/host/homes');
         return;
       }
@@ -156,6 +157,7 @@ exports.postEditHome = (req, res, next) => {
     }
 
     if (!isHostAuthorizedForHome(existingHome, req.session.user)) {
+      setFlash(req, 'error', 'You can only edit homes from your own host dashboard.');
       res.redirect('/host/homes');
       return;
     }
