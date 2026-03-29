@@ -6,7 +6,16 @@
     <title>Host Home List</title>
     <link rel="stylesheet" href="/output.css">
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>body{font-family:'DM Sans',sans-serif}.brand{font-family:'Pacifico',cursive}</style>
+    <style>
+        body{font-family:'DM Sans',sans-serif}
+        .brand{font-family:'Pacifico',cursive}
+        .deleting-card {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.98);
+            transition: opacity 0.28s ease, transform 0.28s ease, margin 0.28s ease, padding 0.28s ease;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body class="bg-rose-50 min-h-screen">
     <header class="bg-white border-b border-rose-100 shadow-sm">
@@ -26,12 +35,12 @@
             </div>
             <a href="/host/add-home" class="bg-rose-500 hover:bg-rose-600 text-white px-5 py-3 rounded-xl text-sm shadow-md">Add Another Home</a>
         </div>
-        <div class="space-y-4">
+        <div class="space-y-4" id="hostHomeList">
             <% if (!homes.length) { %>
-                <div class="bg-white rounded-3xl border border-rose-100 p-6 text-gray-500">No homes registered yet.</div>
+                <div id="emptyHostHomesState" class="bg-white rounded-3xl border border-rose-100 p-6 text-gray-500">No homes registered yet.</div>
             <% } else { %>
                 <% homes.forEach(home => { %>
-                    <div class="bg-white rounded-3xl border border-rose-100 p-5 flex items-center justify-between gap-4">
+                    <div class="bg-white rounded-3xl border border-rose-100 p-5 flex items-center justify-between gap-4" data-home-card="true" data-home-id="<%= home.id %>">
                         <div>
                             <p class="text-sm text-rose-400 mb-1"><%= home.homeType || 'Stay' %></p>
                             <h2 class="text-xl font-semibold text-gray-800"><%= home.houseName %></h2>
@@ -40,7 +49,7 @@
                         <div class="flex flex-wrap gap-3 justify-end">
                             <a href="/homes/<%= home.id %>" class="bg-white hover:bg-rose-50 text-rose-500 px-4 py-2 rounded-xl text-sm border border-rose-200">View</a>
                             <a href="/host/edit-home/<%= home.id %>" class="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-xl text-sm">Edit</a>
-                            <form action="/host/delete-home/<%= home.id %>" method="post" onsubmit="return confirm('Delete <%= home.houseName %>? This action cannot be undone.');">
+                            <form action="/host/delete-home/<%= home.id %>" method="post" data-delete-form="true" data-home-name="<%= home.houseName %>">
                                 <button type="submit" class="bg-white hover:bg-rose-50 text-rose-600 px-4 py-2 rounded-xl text-sm border border-rose-200">
                                     Delete
                                 </button>
@@ -51,5 +60,63 @@
             <% } %>
         </div>
     </main>
+
+    <script>
+        const hostHomeList = document.getElementById('hostHomeList');
+
+        function showEmptyStateIfNeeded() {
+            const remainingCards = hostHomeList.querySelectorAll('[data-home-card="true"]');
+            const existingEmptyState = document.getElementById('emptyHostHomesState');
+
+            if (remainingCards.length === 0 && !existingEmptyState) {
+                const emptyState = document.createElement('div');
+                emptyState.id = 'emptyHostHomesState';
+                emptyState.className = 'bg-white rounded-3xl border border-rose-100 p-6 text-gray-500';
+                emptyState.textContent = 'No homes registered yet.';
+                hostHomeList.appendChild(emptyState);
+            }
+        }
+
+        document.querySelectorAll('[data-delete-form="true"]').forEach((form) => {
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const homeName = form.dataset.homeName || 'this home';
+                const confirmed = window.confirm(`Delete ${homeName}? This action cannot be undone.`);
+                if (!confirmed) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            Accept: 'application/json',
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Delete request failed.');
+                    }
+
+                    const result = await response.json();
+                    const homeCard = form.closest('[data-home-card="true"]');
+
+                    if (homeCard) {
+                        homeCard.classList.add('deleting-card');
+                        window.setTimeout(() => {
+                            homeCard.remove();
+                            showEmptyStateIfNeeded();
+                        }, 280);
+                        return;
+                    }
+
+                    window.location.href = result.redirectTo || '/host/homes';
+                } catch (error) {
+                    window.alert('We could not delete that home right now. Please try again.');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

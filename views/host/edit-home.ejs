@@ -124,7 +124,7 @@
                 <div class="rounded-2xl border border-rose-100 bg-rose-50/60 px-5 py-5">
                     <p class="text-sm font-semibold text-gray-700 mb-1">Delete this listing</p>
                     <p class="text-sm text-gray-500 mb-4">Remove this home from your host dashboard, listing pages, favourites, and details view.</p>
-                    <form action="/host/delete-home/<%= home.id %>" method="post" onsubmit="return confirm('Delete <%= home.houseName %>? This action cannot be undone.');">
+                    <form action="/host/delete-home/<%= home.id %>" method="post" data-delete-form="true" data-home-name="<%= home.houseName %>">
                         <button type="submit" class="bg-white hover:bg-rose-100 text-rose-600 font-semibold px-5 py-3 rounded-xl text-sm border border-rose-200">
                             Delete Home
                         </button>
@@ -165,6 +165,36 @@
 
         validateTextField(houseNameInput, houseNameWarning, 'Use a real home name, not only numbers or symbols.');
         validateTextField(locationInput, locationWarning, 'Use a real location name, not only numbers or symbols.');
+
+        document.querySelectorAll('[data-delete-form="true"]').forEach((form) => {
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const homeName = form.dataset.homeName || 'this home';
+                const confirmed = window.confirm(`Delete ${homeName}? This action cannot be undone.`);
+                if (!confirmed) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            Accept: 'application/json',
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Delete request failed.');
+                    }
+
+                    const result = await response.json();
+                    window.location.href = result.redirectTo || '/host/homes';
+                } catch (error) {
+                    window.alert('We could not delete that home right now. Please try again.');
+                }
+            });
+        });
     </script>
 </body>
 </html>
