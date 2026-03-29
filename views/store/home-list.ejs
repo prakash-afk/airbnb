@@ -68,8 +68,10 @@
             <span class="brand text-rose-500 text-2xl">airbnb</span>
             <nav class="flex items-center gap-6 text-sm flex-wrap justify-end">
                 <a href="/" class="text-rose-500 font-semibold border-b-2 border-rose-500 pb-0.5">Listings</a>
-                <a href="/favourites" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Favourites</a>
-                <a href="/bookings" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Bookings</a>
+                <% if (!(currentUser && currentUser.userType === 'host')) { %>
+                    <a href="/favourites" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Favourites</a>
+                    <a href="/bookings" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Bookings</a>
+                <% } %>
                 <% if (currentUser && currentUser.userType === 'host') { %>
                     <a href="/host/homes" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Host Homes</a>
                     <a href="/host/add-home" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Add Home</a>

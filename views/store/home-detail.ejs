@@ -33,8 +33,10 @@
             <a href="/" class="brand text-rose-500 text-2xl">airbnb</a>
             <nav class="flex gap-5 text-sm">
                 <a href="/" class="text-gray-400 hover:text-rose-500">Listings</a>
-                <a href="/favourites" class="text-gray-400 hover:text-rose-500">Favourites</a>
-                <a href="/bookings" class="text-gray-400 hover:text-rose-500">Bookings</a>
+                <% if (!isHostUser) { %>
+                    <a href="/favourites" class="text-gray-400 hover:text-rose-500">Favourites</a>
+                    <a href="/bookings" class="text-gray-400 hover:text-rose-500">Bookings</a>
+                <% } %>
                 <% if (isLoggedIn) { %>
                     <form action="/logout" method="post">
                         <button type="submit" class="text-gray-400 hover:text-rose-500">Logout</button>
