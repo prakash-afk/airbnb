@@ -12,7 +12,16 @@
     <header class="bg-white border-b border-rose-100 shadow-sm">
         <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
             <a href="/" class="brand text-rose-500 text-2xl">airbnb</a>
-            <a href="/homes/<%= home.id %>" class="text-sm text-gray-400 hover:text-rose-500">Back to detail</a>
+            <div class="flex items-center gap-4 text-sm">
+                <a href="/homes/<%= home.id %>" class="text-gray-400 hover:text-rose-500">Back to detail</a>
+                <% if (isLoggedIn) { %>
+                    <form action="/logout" method="post">
+                        <button type="submit" class="text-gray-400 hover:text-rose-500">Logout</button>
+                    </form>
+                <% } else { %>
+                    <a href="/login" class="text-gray-400 hover:text-rose-500">Login</a>
+                <% } %>
+            </div>
         </div>
     </header>
     <main class="max-w-3xl mx-auto px-6 py-10">

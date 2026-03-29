@@ -34,6 +34,13 @@
                 <a href="/" class="text-gray-400 hover:text-rose-500">Listings</a>
                 <a href="/favourites" class="text-gray-400 hover:text-rose-500">Favourites</a>
                 <a href="/bookings" class="text-gray-400 hover:text-rose-500">Bookings</a>
+                <% if (isLoggedIn) { %>
+                    <form action="/logout" method="post">
+                        <button type="submit" class="text-gray-400 hover:text-rose-500">Logout</button>
+                    </form>
+                <% } else { %>
+                    <a href="/login" class="text-gray-400 hover:text-rose-500">Login</a>
+                <% } %>
             </nav>
         </div>
     </header>

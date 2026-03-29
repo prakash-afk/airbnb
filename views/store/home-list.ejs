@@ -72,6 +72,13 @@
                 <a href="/bookings" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Bookings</a>
                 <a href="/host/homes" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Host Homes</a>
                 <a href="/host/add-home" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Add Home</a>
+                <% if (isLoggedIn) { %>
+                    <form action="/logout" method="post">
+                        <button type="submit" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Logout</button>
+                    </form>
+                <% } else { %>
+                    <a href="/login" class="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-full transition-colors shadow-sm">Login</a>
+                <% } %>
             </nav>
         </div>
     </header>

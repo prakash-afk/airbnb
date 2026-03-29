@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %> - Airbnb</title>
+    <link rel="stylesheet" href="/output.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+        .brand { font-family: 'Pacifico', cursive; }
+        .scene {
+            background:
+                radial-gradient(circle at 15% 20%, rgba(251, 113, 133, 0.18), transparent 24rem),
+                radial-gradient(circle at 85% 18%, rgba(251, 146, 60, 0.18), transparent 22rem),
+                linear-gradient(135deg, #fff7f8 0%, #fff1ec 48%, #fff9f5 100%);
+        }
+        .orb {
+            position: absolute;
+            border-radius: 9999px;
+            filter: blur(4px);
+            opacity: 0.7;
+            animation: drift 9s ease-in-out infinite;
+        }
+        .orb-1 { width: 16rem; height: 16rem; background: rgba(244, 63, 94, 0.15); top: -3rem; left: -3rem; }
+        .orb-2 { width: 12rem; height: 12rem; background: rgba(249, 115, 22, 0.16); right: 6%; top: 10%; animation-delay: -3s; }
+        .orb-3 { width: 14rem; height: 14rem; background: rgba(59, 130, 246, 0.12); bottom: 5%; left: 12%; animation-delay: -5s; }
+        .login-shell {
+            animation: shellRise 0.8s cubic-bezier(.2,.8,.2,1) both;
+            transform-style: preserve-3d;
+            transition: transform 0.18s ease;
+        }
+        .glass-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.84);
+            box-shadow: 0 28px 60px rgba(15, 23, 42, 0.12), 0 14px 30px rgba(244, 63, 94, 0.12);
+        }
+        .field-wrap {
+            position: relative;
+        }
+        .field-input {
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.18s ease;
+        }
+        .field-input:focus {
+            outline: none;
+            border-color: #f43f5e;
+            box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.14);
+            transform: translateY(-1px);
+        }
+        .pulse-ring {
+            position: absolute;
+            inset: -1px;
+            border-radius: 1.5rem;
+            border: 1px solid rgba(244, 63, 94, 0.16);
+            pointer-events: none;
+            animation: ringPulse 2.8s ease-in-out infinite;
+        }
+        .login-btn {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.18s ease, box-shadow 0.22s ease;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 28px rgba(244, 63, 94, 0.28);
+        }
+        .login-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -140%;
+            width: 120%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+            transition: left 0.6s ease;
+        }
+        .login-btn:hover::after {
+            left: 140%;
+        }
+        .mock-card {
+            animation: floatCard 4.4s ease-in-out infinite;
+        }
+        .mock-card:nth-child(2) { animation-delay: -1.6s; }
+        .mock-card:nth-child(3) { animation-delay: -2.8s; }
+        @keyframes drift {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(-18px) translateX(10px); }
+        }
+        @keyframes floatCard {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes shellRise {
+            from { opacity: 0; transform: translateY(26px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes ringPulse {
+            0%, 100% { opacity: 0.45; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.015); }
+        }
+    </style>
+</head>
+<body class="scene min-h-screen">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <header class="relative z-10">
+        <div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+            <a href="/" class="brand text-rose-500 text-2xl">airbnb</a>
+            <a href="/" class="text-sm text-gray-500 hover:text-rose-500 transition-colors">Back to listings</a>
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-6xl mx-auto px-6 py-10 min-h-[calc(100vh-5rem)] flex items-center">
+        <div class="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-10 items-center w-full">
+            <section class="space-y-7">
+                <div class="space-y-4">
+                    <p class="text-sm uppercase tracking-[0.24em] text-rose-400 font-semibold">Host Access</p>
+                    <h1 class="text-5xl md:text-6xl font-semibold text-gray-900 leading-[1.05]">
+                        Sign in and start managing your
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400">stays beautifully</span>
+                    </h1>
+                    <p class="text-lg text-gray-500 max-w-xl leading-8">
+                        Your host dashboard is now session-protected. Log in once, stay signed in across requests, and pick up right where you left off.
+                    </p>
+                </div>
+
+                <div class="grid sm:grid-cols-3 gap-4">
+                    <div class="mock-card glass-card rounded-3xl border border-white/70 p-5">
+                        <p class="text-2xl mb-3">🏡</p>
+                        <p class="text-sm font-semibold text-gray-800 mb-1">Host controls</p>
+                        <p class="text-xs text-gray-500">Create, edit, and remove listings only when authenticated.</p>
+                    </div>
+                    <div class="mock-card glass-card rounded-3xl border border-white/70 p-5">
+                        <p class="text-2xl mb-3">🔐</p>
+                        <p class="text-sm font-semibold text-gray-800 mb-1">Session-backed</p>
+                        <p class="text-xs text-gray-500">Login state is stored on the server and survives page navigation.</p>
+                    </div>
+                    <div class="mock-card glass-card rounded-3xl border border-white/70 p-5">
+                        <p class="text-2xl mb-3">✨</p>
+                        <p class="text-sm font-semibold text-gray-800 mb-1">Smooth entry</p>
+                        <p class="text-xs text-gray-500">Interactive motion gives the auth flow a more polished feel.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="login-shell" id="loginShell">
+                <div class="glass-card rounded-[2rem] border border-white/80 p-8 md:p-9 relative overflow-hidden">
+                    <div class="pulse-ring"></div>
+                    <div class="relative flex items-center justify-between mb-7">
+                        <div>
+                            <p class="text-sm text-rose-400 font-medium mb-1">Welcome back</p>
+                            <h2 class="text-3xl font-semibold text-gray-900">Login to continue</h2>
+                        </div>
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-400 text-white flex items-center justify-center text-2xl shadow-lg">✦</div>
+                    </div>
+
+                    <% if (errors && errors.length) { %>
+                        <div class="mb-5 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-4 text-sm text-rose-600">
+                            <ul class="space-y-1">
+                                <% errors.forEach(error => { %>
+                                    <li><%= error %></li>
+                                <% }) %>
+                            </ul>
+                        </div>
+                    <% } %>
+
+                    <form action="/login" method="post" class="space-y-5">
+                        <div class="field-wrap">
+                            <label class="block text-sm font-medium text-gray-600 mb-2">Email</label>
+                            <input
+                                type="email"
+                                name="email"
+                                required
+                                value="<%= oldInput.email %>"
+                                placeholder="you@example.com"
+                                class="field-input w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-3.5 text-sm text-gray-800"
+                            >
+                        </div>
+
+                        <div class="field-wrap">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-sm font-medium text-gray-600">Password</label>
+                                <button type="button" id="togglePassword" class="text-xs text-rose-500 hover:text-rose-600">Show</button>
+                            </div>
+                            <input
+                                type="password"
+                                name="password"
+                                id="passwordInput"
+                                required
+                                placeholder="Enter your password"
+                                class="field-input w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-3.5 text-sm text-gray-800"
+                            >
+                        </div>
+
+                        <button type="submit" class="login-btn w-full bg-gradient-to-r from-rose-500 to-orange-400 text-white font-semibold py-3.5 rounded-2xl text-sm">
+                            Login to Host Dashboard
+                        </button>
+                    </form>
+
+                    <div class="mt-6 rounded-2xl bg-gray-50 border border-gray-100 px-4 py-4">
+                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400 mb-2">Demo Credentials</p>
+                        <p class="text-sm text-gray-600">Email: <span class="font-semibold text-gray-800"><%= demoCredentials.email %></span></p>
+                        <p class="text-sm text-gray-600">Password: <span class="font-semibold text-gray-800"><%= demoCredentials.password %></span></p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const shell = document.getElementById('loginShell');
+        const passwordInput = document.getElementById('passwordInput');
+        const togglePassword = document.getElementById('togglePassword');
+
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', () => {
+                const nextType = passwordInput.type === 'password' ? 'text' : 'password';
+                passwordInput.type = nextType;
+                togglePassword.textContent = nextType === 'password' ? 'Show' : 'Hide';
+            });
+        }
+
+        window.addEventListener('mousemove', (event) => {
+            if (!shell || window.innerWidth < 1024) {
+                return;
+            }
+
+            const rect = shell.getBoundingClientRect();
+            const x = (event.clientX - rect.left - rect.width / 2) / rect.width;
+            const y = (event.clientY - rect.top - rect.height / 2) / rect.height;
+
+            shell.style.transform = `rotateX(${(-y * 6).toFixed(2)}deg) rotateY(${(x * 8).toFixed(2)}deg)`;
+        });
+
+        window.addEventListener('mouseleave', () => {
+            if (shell) {
+                shell.style.transform = 'rotateX(0deg) rotateY(0deg)';
+            }
+        });
+    </script>
+</body>
+</html>

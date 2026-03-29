@@ -25,9 +25,12 @@
     <header class="bg-white border-b border-rose-100 shadow-sm">
         <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
             <a href="/" class="brand text-rose-500 text-2xl">airbnb</a>
-            <div class="flex gap-4 text-sm">
+            <div class="flex gap-4 text-sm items-center">
                 <a href="/host/homes" class="text-gray-400 hover:text-rose-500">Host Homes</a>
                 <a href="/homes/<%= home.id %>" class="text-gray-400 hover:text-rose-500">Open Detail</a>
+                <form action="/logout" method="post">
+                    <button type="submit" class="text-gray-400 hover:text-rose-500">Logout</button>
+                </form>
             </div>
         </div>
     </header>
@@ -185,13 +188,15 @@
                     });
 
                     if (!response.ok) {
-                        throw new Error('Delete request failed.');
+                        const errorText = await response.text();
+                        throw new Error(errorText || 'Delete request failed.');
                     }
 
                     const result = await response.json();
                     window.location.href = result.redirectTo || '/host/homes';
                 } catch (error) {
-                    window.alert('We could not delete that home right now. Please try again.');
+                    console.error('Delete failed:', error);
+                    window.alert(`We could not delete that home right now. ${error.message}`);
                 }
             });
         });

@@ -1,6 +1,12 @@
 const Home = require('../models/home');
 
 exports.getHome = (req, res, next) => {
+  console.log('Session snapshot:', {
+    id: req.sessionID,
+    isLoggedIn: req.session?.isLoggedIn,
+    user: req.session?.user?.email,
+  });
+
   Home.fetchAll((error, registeredHomes) => {
     if (error) {
       next(error);

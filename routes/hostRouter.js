@@ -1,7 +1,10 @@
 const express = require('express');
 const hostController = require('../controllers/hostController');
+const { requireLogin } = require('../middleware/auth');
 
 const hostRouter = express.Router();
+
+hostRouter.use(requireLogin);
 
 hostRouter.get('/host/add-home', hostController.getAddHome);
 hostRouter.post('/host/add-home', hostController.postAddHome);

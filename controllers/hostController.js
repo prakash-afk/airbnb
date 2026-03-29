@@ -144,30 +144,18 @@ exports.postDeleteHome = (req, res, next) => {
       return;
     }
 
-    const wantsJson = req.get('accept')?.includes('application/json');
-
     if (!deletedHome) {
-      if (wantsJson) {
-        res.status(200).json({
-          message: 'Home was already removed.',
-          redirectTo: '/host/homes',
-        });
-        return;
-      }
-
-      res.redirect(303, '/host/homes');
-      return;
-    }
-
-    if (wantsJson) {
       res.status(200).json({
-        message: 'Home deleted successfully.',
+        message: 'Home was already removed.',
         redirectTo: '/host/homes',
       });
       return;
     }
 
-    res.redirect(303, '/host/homes');
+    res.status(200).json({
+      message: 'Home deleted successfully.',
+      redirectTo: '/host/homes',
+    });
   });
 };
 
