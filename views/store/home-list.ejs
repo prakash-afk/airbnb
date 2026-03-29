@@ -70,14 +70,17 @@
                 <a href="/" class="text-rose-500 font-semibold border-b-2 border-rose-500 pb-0.5">Listings</a>
                 <a href="/favourites" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Favourites</a>
                 <a href="/bookings" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Bookings</a>
-                <a href="/host/homes" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Host Homes</a>
-                <a href="/host/add-home" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Add Home</a>
+                <% if (currentUser && currentUser.userType === 'host') { %>
+                    <a href="/host/homes" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Host Homes</a>
+                    <a href="/host/add-home" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Add Home</a>
+                <% } %>
                 <% if (isLoggedIn) { %>
                     <form action="/logout" method="post">
                         <button type="submit" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Logout</button>
                     </form>
                 <% } else { %>
                     <a href="/login" class="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-full transition-colors shadow-sm">Login</a>
+                    <a href="/signup" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Sign Up</a>
                 <% } %>
             </nav>
         </div>
@@ -99,10 +102,17 @@
                 <div class="text-6xl mb-4">🏠</div>
                 <h2 class="text-xl font-semibold text-gray-700">No homes listed yet</h2>
                 <p class="text-gray-400 mt-1 mb-6 text-sm">Be the first to add your home!</p>
-                <a href="/host/add-home"
-                   class="bg-rose-500 hover:bg-rose-600 text-white text-sm font-medium px-6 py-2.5 rounded-full transition-all duration-200 shadow">
-                    Add a Home
-                </a>
+                <% if (currentUser && currentUser.userType === 'host') { %>
+                    <a href="/host/add-home"
+                       class="bg-rose-500 hover:bg-rose-600 text-white text-sm font-medium px-6 py-2.5 rounded-full transition-all duration-200 shadow">
+                        Add a Home
+                    </a>
+                <% } else { %>
+                    <a href="/signup"
+                       class="bg-rose-500 hover:bg-rose-600 text-white text-sm font-medium px-6 py-2.5 rounded-full transition-all duration-200 shadow">
+                        Create Account
+                    </a>
+                <% } %>
             </div>
 
         <% } else { %>
@@ -113,10 +123,17 @@
                     <span class="font-semibold text-gray-600"><%= registerHome.length %></span>
                     home listing<%= registerHome.length !== 1 ? 's' : '' %>
                 </p>
-                <a href="/host/add-home"
-                   class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-medium px-4 py-2 rounded-full transition-all shadow">
-                    + Add Home
-                </a>
+                <% if (currentUser && currentUser.userType === 'host') { %>
+                    <a href="/host/add-home"
+                       class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-medium px-4 py-2 rounded-full transition-all shadow">
+                        + Add Home
+                    </a>
+                <% } else if (!isLoggedIn) { %>
+                    <a href="/signup"
+                       class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-medium px-4 py-2 rounded-full transition-all shadow">
+                        + Sign Up
+                    </a>
+                <% } %>
             </div>
 
             <%# Cards Grid %>
@@ -262,6 +279,11 @@
                     });
 
                     if (!response.ok) {
+                        if (response.status === 401) {
+                            const result = await response.json();
+                            window.location.href = result.redirectTo || '/login';
+                            return;
+                        }
                         throw new Error('Could not update favourite status.');
                     }
 

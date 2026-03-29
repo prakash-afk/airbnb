@@ -40,6 +40,7 @@
                     </form>
                 <% } else { %>
                     <a href="/login" class="text-gray-400 hover:text-rose-500">Login</a>
+                    <a href="/signup" class="text-gray-400 hover:text-rose-500">Sign Up</a>
                 <% } %>
             </nav>
         </div>
@@ -134,9 +135,11 @@
                     </a>
                 </div>
 
-                <a href="/host/edit-home/<%= home.id %>" class="block text-center text-sm text-gray-400 hover:text-rose-500 transition-colors">
-                    Open Host Edit View
-                </a>
+                <% if (currentUser && currentUser.userType === 'host') { %>
+                    <a href="/host/edit-home/<%= home.id %>" class="block text-center text-sm text-gray-400 hover:text-rose-500 transition-colors">
+                        Open Host Edit View
+                    </a>
+                <% } %>
             </div>
         </div>
     </main>
@@ -159,6 +162,11 @@
                     });
 
                     if (!response.ok) {
+                        if (response.status === 401) {
+                            const result = await response.json();
+                            window.location.href = result.redirectTo || '/login';
+                            return;
+                        }
                         throw new Error('Could not update favourite status.');
                     }
 

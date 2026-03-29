@@ -1,7 +1,7 @@
-const demoCredentials = {
-  email: process.env.DEMO_LOGIN_EMAIL || 'host@airbnb.dev',
-  password: process.env.DEMO_LOGIN_PASSWORD || 'airbnb123',
-};
+const bcrypt = require('bcryptjs');
+const { validationResult } = require('express-validator');
+
+const User = require('../models/user');
 
 function buildLoginInput(body = {}) {
   return {
@@ -9,9 +9,19 @@ function buildLoginInput(body = {}) {
   };
 }
 
+function buildSignupInput(body = {}) {
+  return {
+    firstName: body.firstName || '',
+    lastName: body.lastName || '',
+    email: body.email || '',
+    userType: body.userType || 'guest',
+    terms: body.terms ? 'on' : '',
+  };
+}
+
 exports.getLogin = (req, res) => {
   if (req.session?.isLoggedIn) {
-    res.redirect('/host/homes');
+    res.redirect(req.session.user?.userType === 'host' ? '/host/homes' : '/');
     return;
   }
 
@@ -19,58 +29,105 @@ exports.getLogin = (req, res) => {
     pageTitle: 'Login',
     errors: [],
     oldInput: buildLoginInput(),
-    demoCredentials: {
-      email: demoCredentials.email,
-      password: demoCredentials.password,
-    },
   });
 };
 
-exports.postLogin = (req, res) => {
-  const email = req.body.email?.trim() || '';
-  const password = req.body.password || '';
-  const errors = [];
-
-  if (!email) {
-    errors.push('Email is required.');
+exports.getSignup = (req, res) => {
+  if (req.session?.isLoggedIn) {
+    res.redirect('/');
+    return;
   }
 
-  if (!password) {
-    errors.push('Password is required.');
-  }
+  res.render('auth/signup', {
+    pageTitle: 'Sign Up',
+    errors: [],
+    oldInput: buildSignupInput(),
+  });
+};
 
-  if (errors.length === 0) {
-    const isValidLogin = email === demoCredentials.email && password === demoCredentials.password;
+exports.postSignup = async (req, res, next) => {
+  const validationErrors = validationResult(req);
 
-    if (!isValidLogin) {
-      errors.push('Invalid email or password. Use the demo credentials shown below.');
-    }
-  }
-
-  if (errors.length > 0) {
-    res.status(422).render('auth/login', {
-      pageTitle: 'Login',
-      errors,
-      oldInput: buildLoginInput(req.body),
-      demoCredentials: {
-        email: demoCredentials.email,
-        password: demoCredentials.password,
-      },
+  if (!validationErrors.isEmpty()) {
+    res.status(422).render('auth/signup', {
+      pageTitle: 'Sign Up',
+      errors: validationErrors.array().map((error) => error.msg),
+      oldInput: buildSignupInput(req.body),
     });
     return;
   }
 
-  req.session.isLoggedIn = true;
-  req.session.user = {
-    email,
-    displayName: email.split('@')[0],
-  };
+  try {
+    const hashedPassword = await bcrypt.hash(req.body.password, 12);
 
-  req.session.save(() => {
-    const returnTo = req.session.returnTo;
-    delete req.session.returnTo;
-    res.redirect(returnTo || '/host/homes');
-  });
+    await User.create({
+      firstName: req.body.firstName?.trim(),
+      lastName: req.body.lastName?.trim(),
+      email: req.body.email?.trim().toLowerCase(),
+      password: hashedPassword,
+      userType: req.body.userType,
+      favouriteHomeIds: [],
+    });
+
+    res.redirect('/login');
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.postLogin = async (req, res, next) => {
+  const validationErrors = validationResult(req);
+
+  if (!validationErrors.isEmpty()) {
+    res.status(422).render('auth/login', {
+      pageTitle: 'Login',
+      errors: validationErrors.array().map((error) => error.msg),
+      oldInput: buildLoginInput(req.body),
+    });
+    return;
+  }
+
+  try {
+    const email = req.body.email?.trim().toLowerCase();
+    const password = req.body.password || '';
+    const user = await User.findByEmail(email);
+
+    if (!user) {
+      res.status(422).render('auth/login', {
+        pageTitle: 'Login',
+        errors: ['No account found with that email address.'],
+        oldInput: buildLoginInput(req.body),
+      });
+      return;
+    }
+
+    const passwordMatches = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatches) {
+      res.status(422).render('auth/login', {
+        pageTitle: 'Login',
+        errors: ['Incorrect password. Please try again.'],
+        oldInput: buildLoginInput(req.body),
+      });
+      return;
+    }
+
+    req.session.isLoggedIn = true;
+    req.session.user = {
+      id: user.id,
+      email: user.email,
+      displayName: `${user.firstName} ${user.lastName}`.trim(),
+      userType: user.userType,
+    };
+
+    req.session.save(() => {
+      const returnTo = req.session.returnTo;
+      delete req.session.returnTo;
+      res.redirect(returnTo || (user.userType === 'host' ? '/host/homes' : '/'));
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 exports.postLogout = (req, res) => {
