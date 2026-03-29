@@ -27,6 +27,7 @@
     </style>
 </head>
 <body class="bg-rose-50 min-h-screen">
+    <% const isHostUser = currentUser && currentUser.userType === 'host'; %>
     <header class="bg-white border-b border-rose-100 shadow-sm">
         <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
             <a href="/" class="brand text-rose-500 text-2xl">airbnb</a>
@@ -81,6 +82,7 @@
                         <span class="<%= home.availability === 'available' ? 'bg-rose-50 text-rose-400' : 'bg-gray-100 text-gray-500' %> text-xs px-3 py-1.5 rounded-full">
                             <%= home.availability === 'available' ? 'Available' : 'Unavailable' %>
                         </span>
+                        <% if (!isHostUser) { %>
                         <button
                             id="detailWishlistButton"
                             class="wishlist-btn <%= home.isFavourite ? 'active' : '' %> flex items-center gap-2 px-4 py-2 rounded-full border border-rose-100 text-sm font-medium text-gray-600 bg-white"
@@ -91,6 +93,7 @@
                             <span id="detailWishlistIcon"><%= home.isFavourite ? '♥' : '♡' %></span>
                             <span id="detailWishlistLabel"><%= home.isFavourite ? 'Wishlisted' : 'Add to wishlist' %></span>
                         </button>
+                        <% } %>
                     </div>
                 </div>
 
@@ -108,8 +111,8 @@
                         <p class="text-gray-800 font-medium">Up to <%= home.maxGuests %></p>
                     </div>
                     <div class="rounded-2xl bg-rose-50 px-4 py-3">
-                        <p class="text-gray-400">Wishlist</p>
-                        <p id="wishlistStatusText" class="text-gray-800 font-medium"><%= home.isFavourite ? 'Saved in favourites' : 'Not saved yet' %></p>
+                        <p class="text-gray-400"><%= isHostUser ? 'Hosting view' : 'Wishlist' %></p>
+                        <p id="wishlistStatusText" class="text-gray-800 font-medium"><%= isHostUser ? 'Favourites are available for guests only' : (home.isFavourite ? 'Saved in favourites' : 'Not saved yet') %></p>
                     </div>
                 </div>
 
@@ -130,9 +133,15 @@
                     <a href="/reserve/<%= home.id %>" class="bg-rose-500 hover:bg-rose-600 text-white text-sm font-medium px-6 py-3 rounded-xl text-center shadow-md">
                         Book This Home
                     </a>
-                    <a href="/favourites" class="bg-white hover:bg-rose-50 text-rose-500 text-sm font-medium px-6 py-3 rounded-xl text-center border border-rose-200">
-                        Open Wishlist
-                    </a>
+                    <% if (!isHostUser) { %>
+                        <a href="/favourites" class="bg-white hover:bg-rose-50 text-rose-500 text-sm font-medium px-6 py-3 rounded-xl text-center border border-rose-200">
+                            Open Wishlist
+                        </a>
+                    <% } else { %>
+                        <a href="/" class="bg-white hover:bg-rose-50 text-rose-500 text-sm font-medium px-6 py-3 rounded-xl text-center border border-rose-200">
+                            Back to Listings
+                        </a>
+                    <% } %>
                 </div>
 
                 <% if (currentUser && currentUser.userType === 'host') { %>

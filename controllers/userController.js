@@ -126,6 +126,20 @@ exports.toggleFavourite = async (req, res, next) => {
   }
 
   try {
+    const currentUser = await getCurrentUser(req);
+
+    if (!currentUser) {
+      res.status(404).json({ message: 'User not found.' });
+      return;
+    }
+
+    if (currentUser.userType === 'host') {
+      res.status(403).json({
+        message: 'Favourites are available for guest accounts only.',
+      });
+      return;
+    }
+
     const home = await fetchHomeById(req.params.homeId);
 
     if (!home) {

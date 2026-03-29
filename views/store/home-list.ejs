@@ -86,6 +86,9 @@
         </div>
     </header>
 
+    <% const isHostUser = currentUser && currentUser.userType === 'host'; %>
+    <% const isGuestUser = currentUser && currentUser.userType === 'guest'; %>
+
     <%# Hero %>
     <section class="max-w-5xl mx-auto px-6 pt-10 pb-4 fade-in">
         <h1 class="text-4xl font-semibold text-gray-800 leading-tight">
@@ -100,17 +103,24 @@
             <%# Empty State %>
             <div class="flex flex-col items-center justify-center py-24 text-center fade-in">
                 <div class="text-6xl mb-4">🏠</div>
-                <h2 class="text-xl font-semibold text-gray-700">No homes listed yet</h2>
-                <p class="text-gray-400 mt-1 mb-6 text-sm">Be the first to add your home!</p>
-                <% if (currentUser && currentUser.userType === 'host') { %>
+                <% if (isGuestUser) { %>
+                    <h2 class="text-xl font-semibold text-gray-700">No stays are available right now</h2>
+                    <p class="text-gray-400 mt-1 text-sm max-w-md">
+                        Sorry for the inconvenience. There are no homes available to book at the moment.
+                    </p>
+                    <p class="text-gray-400 mt-2 text-sm max-w-md">
+                        Please check back soon for new listings from our hosts.
+                    </p>
+                <% } else { %>
+                    <h2 class="text-xl font-semibold text-gray-700">No homes listed yet</h2>
+                    <p class="text-gray-400 mt-1 mb-6 text-sm">
+                        <%= isHostUser ? 'Be the first to add your home!' : 'Sorry for the inconvenience. There are no stays available yet.' %>
+                    </p>
+                <% } %>
+                <% if (isHostUser) { %>
                     <a href="/host/add-home"
                        class="bg-rose-500 hover:bg-rose-600 text-white text-sm font-medium px-6 py-2.5 rounded-full transition-all duration-200 shadow">
                         Add a Home
-                    </a>
-                <% } else { %>
-                    <a href="/signup"
-                       class="bg-rose-500 hover:bg-rose-600 text-white text-sm font-medium px-6 py-2.5 rounded-full transition-all duration-200 shadow">
-                        Create Account
                     </a>
                 <% } %>
             </div>
@@ -165,15 +175,17 @@
                                     </span>
                                 <% } %>
 
-                                <%# Wishlist button %>
-                                <button
-                                    class="wishlist-btn absolute top-3 right-3 text-gray-300 text-xl bg-white/90 w-8 h-8 rounded-full flex items-center justify-center shadow-sm <%= home.isFavourite ? 'active' : '' %>"
-                                    data-home-id="<%= home.id %>"
-                                    data-is-favourite="<%= home.isFavourite ? 'true' : 'false' %>"
-                                    aria-label="Toggle favourite"
-                                >
-                                    <%= home.isFavourite ? '♥' : '♡' %>
-                                </button>
+                                <% if (!isHostUser) { %>
+                                    <%# Wishlist button %>
+                                    <button
+                                        class="wishlist-btn absolute top-3 right-3 text-gray-300 text-xl bg-white/90 w-8 h-8 rounded-full flex items-center justify-center shadow-sm <%= home.isFavourite ? 'active' : '' %>"
+                                        data-home-id="<%= home.id %>"
+                                        data-is-favourite="<%= home.isFavourite ? 'true' : 'false' %>"
+                                        aria-label="Toggle favourite"
+                                    >
+                                        <%= home.isFavourite ? '♥' : '♡' %>
+                                    </button>
+                                <% } %>
                             </div>
 
                             <%# Info %>
