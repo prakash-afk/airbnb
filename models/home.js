@@ -51,6 +51,16 @@ const homeSchema = new mongoose.Schema(
       enum: allowedAvailability,
       default: 'available',
     },
+    ownerHostId: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    ownerHostName: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     isFavourite: {
       type: Boolean,
       default: false,
@@ -65,7 +75,20 @@ const homeSchema = new mongoose.Schema(
 const HomeDocument = mongoose.models.Home || mongoose.model('Home', homeSchema, 'homes');
 
 module.exports = class Home {
-  constructor(houseName, price, location, rating, photo, homeType, maxGuests, availability, id = randomUUID(), isFavourite = false) {
+  constructor(
+    houseName,
+    price,
+    location,
+    rating,
+    photo,
+    homeType,
+    maxGuests,
+    availability,
+    id = randomUUID(),
+    isFavourite = false,
+    ownerHostId = '',
+    ownerHostName = ''
+  ) {
     this.id = id;
     this.houseName = houseName?.trim();
     this.price = price === '' || price === undefined || price === null ? null : Number(price);
@@ -76,6 +99,8 @@ module.exports = class Home {
     this.maxGuests = maxGuests === '' || maxGuests === undefined || maxGuests === null ? 1 : Number(maxGuests);
     this.availability = availability === 'unavailable' ? 'unavailable' : 'available';
     this.isFavourite = Boolean(isFavourite);
+    this.ownerHostId = ownerHostId?.trim() || '';
+    this.ownerHostName = ownerHostName?.trim() || '';
   }
 
   save(callback) {
@@ -89,6 +114,8 @@ module.exports = class Home {
       homeType: this.homeType,
       maxGuests: this.maxGuests,
       availability: this.availability,
+      ownerHostId: this.ownerHostId,
+      ownerHostName: this.ownerHostName,
       isFavourite: this.isFavourite,
     });
 
@@ -163,12 +190,24 @@ module.exports = class Home {
       homeType: home.homeType?.trim() || '',
       maxGuests: home.maxGuests === '' || home.maxGuests === undefined || home.maxGuests === null ? 1 : Number(home.maxGuests),
       availability: home.availability === 'unavailable' ? 'unavailable' : 'available',
+      ownerHostId: home.ownerHostId?.trim() || '',
+      ownerHostName: home.ownerHostName?.trim() || '',
       isFavourite: Boolean(home.isFavourite),
     };
   }
 
   static fetchAll(callback) {
     HomeDocument.find()
+      .sort({ createdAt: 1, _id: 1 })
+      .lean()
+      .then((homes) => callback(null, homes.map((home) => Home.normalizeHome(home))))
+      .catch((error) => callback(error));
+  }
+
+  static fetchByOwnerId(ownerHostId, callback) {
+    HomeDocument.find({
+      $or: [{ ownerHostId }, { ownerHostId: { $exists: false } }, { ownerHostId: '' }],
+    })
       .sort({ createdAt: 1, _id: 1 })
       .lean()
       .then((homes) => callback(null, homes.map((home) => Home.normalizeHome(home))))
@@ -208,7 +247,9 @@ module.exports = class Home {
           homePayload.maxGuests,
           homePayload.availability,
           existingHome.id,
-          existingHome.isFavourite
+          existingHome.isFavourite,
+          homePayload.ownerHostId || existingHome.ownerHostId,
+          homePayload.ownerHostName || existingHome.ownerHostName
         );
 
         return HomeDocument.findOneAndUpdate(
@@ -222,6 +263,8 @@ module.exports = class Home {
             homeType: updatedHome.homeType,
             maxGuests: updatedHome.maxGuests,
             availability: updatedHome.availability,
+            ownerHostId: updatedHome.ownerHostId,
+            ownerHostName: updatedHome.ownerHostName,
             isFavourite: updatedHome.isFavourite,
           },
           { new: true }

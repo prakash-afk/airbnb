@@ -64,13 +64,13 @@
     <main class="max-w-6xl mx-auto px-6 py-10 min-h-[calc(100vh-5rem)] flex items-center">
         <div class="grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-10 items-center w-full">
             <section class="space-y-5">
-                <p class="text-sm uppercase tracking-[0.24em] text-rose-400 font-semibold">Join Airbnb</p>
+                <p class="text-sm uppercase tracking-[0.24em] text-rose-400 font-semibold">Choose your role</p>
                 <h1 class="text-5xl md:text-6xl font-semibold text-gray-900 leading-[1.05]">
-                    Create your account and make favourites
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400">truly yours</span>
+                    Create your account and unlock your
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400">guest or host flow</span>
                 </h1>
                 <p class="text-lg text-gray-500 max-w-xl leading-8">
-                    Sign up as a guest or host. Your favourites, session, and access level will now belong to your account instead of being shared globally.
+                    Sign up as a guest to save favourites and book stays, or join as a host to publish and manage your own listings from a dedicated dashboard.
                 </p>
             </section>
 
@@ -125,12 +125,12 @@
                                 <button type="button" class="type-card <%= oldInput.userType === 'guest' ? 'active' : '' %> rounded-2xl border border-gray-200 px-4 py-4 text-left" data-user-type="guest">
                                     <span class="block text-2xl mb-2">🧳</span>
                                     <span class="block text-sm font-semibold">Guest</span>
-                                    <span class="block text-xs text-gray-500 mt-1">Save favourites and explore stays.</span>
+                                    <span class="block text-xs text-gray-500 mt-1">Save favourites, browse homes, and book stays.</span>
                                 </button>
                                 <button type="button" class="type-card <%= oldInput.userType === 'host' ? 'active' : '' %> rounded-2xl border border-gray-200 px-4 py-4 text-left" data-user-type="host">
                                     <span class="block text-2xl mb-2">🏠</span>
                                     <span class="block text-sm font-semibold">Host</span>
-                                    <span class="block text-xs text-gray-500 mt-1">Manage and publish your listings.</span>
+                                    <span class="block text-xs text-gray-500 mt-1">Publish, edit, and manage listings from your host dashboard.</span>
                                 </button>
                             </div>
                             <input type="hidden" name="userType" id="userTypeInput" value="<%= oldInput.userType %>">
@@ -138,7 +138,7 @@
 
                         <label class="flex items-start gap-3 rounded-2xl border border-gray-200 bg-white/70 px-4 py-4 text-sm text-gray-600">
                             <input type="checkbox" name="terms" <%= oldInput.terms ? 'checked' : '' %> class="mt-1 accent-rose-500">
-                            <span>I agree to the hosting and guest terms, privacy practices, and session-based account access.</span>
+                            <span>I agree to the guest and host terms, privacy practices, and role-based account access.</span>
                         </label>
 
                         <button type="submit" class="signup-btn w-full bg-gradient-to-r from-rose-500 to-orange-400 text-white font-semibold py-3.5 rounded-2xl text-sm">

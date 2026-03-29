@@ -77,6 +77,9 @@
                     <a href="/host/add-home" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Add Home</a>
                 <% } %>
                 <% if (isLoggedIn) { %>
+                    <span class="inline-flex items-center rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-rose-500">
+                        <%= currentUser.userType %>
+                    </span>
                     <form action="/logout" method="post">
                         <button type="submit" class="text-gray-400 hover:text-rose-500 transition-colors pb-0.5">Logout</button>
                     </form>

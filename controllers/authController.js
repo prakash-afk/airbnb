@@ -34,7 +34,7 @@ exports.getLogin = (req, res) => {
 
 exports.getSignup = (req, res) => {
   if (req.session?.isLoggedIn) {
-    res.redirect('/');
+    res.redirect(req.session.user?.userType === 'host' ? '/host/homes' : '/');
     return;
   }
 

@@ -24,6 +24,14 @@ function buildFormData(body) {
   };
 }
 
+function isHostAuthorizedForHome(home, currentUser) {
+  if (!home || !currentUser?.id) {
+    return false;
+  }
+
+  return !home.ownerHostId || home.ownerHostId === currentUser.id;
+}
+
 exports.getAddHome = (req, res) => {
   res.render('host/addHome', {
     errors: [],
@@ -50,7 +58,11 @@ exports.postAddHome = (req, res, next) => {
     req.body.photo,
     req.body.homeType,
     req.body.maxGuests,
-    req.body.availability
+    req.body.availability,
+    undefined,
+    false,
+    req.session.user.id,
+    req.session.user.displayName
   );
 
   newHome.save((error, savedHome) => {
@@ -68,7 +80,7 @@ exports.postAddHome = (req, res, next) => {
 };
 
 exports.getHostHomeList = (req, res, next) => {
-  Home.fetchAll((error, homes) => {
+  Home.fetchByOwnerId(req.session.user.id, (error, homes) => {
     if (error) {
       next(error);
       return;
@@ -87,6 +99,11 @@ exports.getEditHome = (req, res, next) => {
 
     if (!home) {
       res.status(404).render('404');
+      return;
+    }
+
+    if (!isHostAuthorizedForHome(home, req.session.user)) {
+      res.redirect('/host/homes');
       return;
     }
 
@@ -113,6 +130,11 @@ exports.postEditHome = (req, res, next) => {
         return;
       }
 
+      if (!isHostAuthorizedForHome(home, req.session.user)) {
+        res.redirect('/host/homes');
+        return;
+      }
+
       res.status(422).render('host/edit-home', {
         home,
         errors: validationErrors,
@@ -122,29 +144,54 @@ exports.postEditHome = (req, res, next) => {
     return;
   }
 
-  Home.updateById(req.params.homeId, req.body, (error, updatedHome) => {
-    if (error) {
-      next(error);
+  Home.fetchById(req.params.homeId, (fetchError, existingHome) => {
+    if (fetchError) {
+      next(fetchError);
       return;
     }
 
-    if (!updatedHome) {
+    if (!existingHome) {
       res.status(404).render('404');
       return;
     }
 
-    res.redirect(`/homes/${updatedHome.id}`);
+    if (!isHostAuthorizedForHome(existingHome, req.session.user)) {
+      res.redirect('/host/homes');
+      return;
+    }
+
+    Home.updateById(
+      req.params.homeId,
+      {
+        ...req.body,
+        ownerHostId: existingHome.ownerHostId || req.session.user.id,
+        ownerHostName: existingHome.ownerHostName || req.session.user.displayName,
+      },
+      (error, updatedHome) => {
+        if (error) {
+          next(error);
+          return;
+        }
+
+        if (!updatedHome) {
+          res.status(404).render('404');
+          return;
+        }
+
+        res.redirect(`/homes/${updatedHome.id}`);
+      }
+    );
   });
 };
 
 exports.postDeleteHome = (req, res, next) => {
-  Home.deleteById(req.params.homeId, (error, deletedHome) => {
-    if (error) {
-      next(error);
+  Home.fetchById(req.params.homeId, (fetchError, home) => {
+    if (fetchError) {
+      next(fetchError);
       return;
     }
 
-    if (!deletedHome) {
+    if (!home) {
       res.status(200).json({
         message: 'Home was already removed.',
         redirectTo: '/host/homes',
@@ -152,9 +199,32 @@ exports.postDeleteHome = (req, res, next) => {
       return;
     }
 
-    res.status(200).json({
-      message: 'Home deleted successfully.',
-      redirectTo: '/host/homes',
+    if (!isHostAuthorizedForHome(home, req.session.user)) {
+      res.status(403).json({
+        message: 'You can only delete homes from your own host dashboard.',
+        redirectTo: '/host/homes',
+      });
+      return;
+    }
+
+    Home.deleteById(req.params.homeId, (error, deletedHome) => {
+      if (error) {
+        next(error);
+        return;
+      }
+
+      if (!deletedHome) {
+        res.status(200).json({
+          message: 'Home was already removed.',
+          redirectTo: '/host/homes',
+        });
+        return;
+      }
+
+      res.status(200).json({
+        message: 'Home deleted successfully.',
+        redirectTo: '/host/homes',
+      });
     });
   });
 };
