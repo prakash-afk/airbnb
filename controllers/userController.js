@@ -1,5 +1,6 @@
 const Home = require('../models/home');
 const User = require('../models/user');
+const { setFlash } = require('../utils/flash');
 
 function fetchAllHomes() {
   return new Promise((resolve, reject) => {
@@ -35,6 +36,14 @@ async function getCurrentUser(req) {
   return User.findById(req.session.user.id);
 }
 
+function getReviewDraftForUser(home, currentUser) {
+  if (!currentUser || !Array.isArray(home?.reviews)) {
+    return null;
+  }
+
+  return home.reviews.find((review) => review.userId === currentUser.id) || null;
+}
+
 function attachFavouriteState(homes, currentUser) {
   const favouriteIds = new Set(currentUser?.favouriteHomeIds || []);
   return homes.map((home) => ({
@@ -65,6 +74,12 @@ exports.getHomeDetail = async (req, res, next) => {
       home: {
         ...home,
         isFavourite: favouriteIds.has(home.id),
+      },
+      existingReview: getReviewDraftForUser(home, currentUser),
+      reviewErrors: [],
+      reviewFormData: {
+        rating: '',
+        comment: '',
       },
     });
   } catch (error) {
@@ -161,6 +176,76 @@ exports.toggleFavourite = async (req, res, next) => {
         isFavourite: favouriteState.isFavourite,
       },
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.postReview = async (req, res, next) => {
+  try {
+    const currentUser = await getCurrentUser(req);
+
+    if (!currentUser) {
+      setFlash(req, 'info', 'Please log in as a guest to leave a review.');
+      res.redirect('/login');
+      return;
+    }
+
+    if (currentUser.userType !== 'guest') {
+      setFlash(req, 'info', 'Only guest accounts can submit reviews.');
+      res.redirect(`/homes/${req.params.homeId}`);
+      return;
+    }
+
+    const home = await fetchHomeById(req.params.homeId);
+
+    if (!home) {
+      res.status(404).render('404');
+      return;
+    }
+
+    const reviewErrors = Home.validateReview(req.body);
+
+    if (reviewErrors.length > 0) {
+      const favouriteIds = new Set(currentUser?.favouriteHomeIds || []);
+      res.status(422).render('store/home-detail', {
+        home: {
+          ...home,
+          isFavourite: favouriteIds.has(home.id),
+        },
+        existingReview: getReviewDraftForUser(home, currentUser),
+        reviewErrors,
+        reviewFormData: {
+          rating: req.body.rating || '',
+          comment: req.body.comment || '',
+        },
+      });
+      return;
+    }
+
+    Home.addOrUpdateReview(
+      req.params.homeId,
+      {
+        userId: currentUser.id,
+        userName: `${currentUser.firstName} ${currentUser.lastName}`.trim() || currentUser.email,
+        rating: req.body.rating,
+        comment: req.body.comment,
+      },
+      (error, updatedHome) => {
+        if (error) {
+          next(error);
+          return;
+        }
+
+        if (!updatedHome) {
+          res.status(404).render('404');
+          return;
+        }
+
+        setFlash(req, 'info', 'Your review has been shared successfully.');
+        res.redirect(`/homes/${updatedHome.id}`);
+      }
+    );
   } catch (error) {
     next(error);
   }

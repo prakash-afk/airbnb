@@ -10,5 +10,6 @@ userRouter.get('/favourites', requireGuestAccount, userController.getFavouriteLi
 userRouter.get('/reserve/:homeId', userController.getReservePage);
 userRouter.get('/bookings', requireGuestAccount, userController.getBookings);
 userRouter.post('/favourites/:homeId', userController.toggleFavourite);
+userRouter.post('/homes/:homeId/reviews', requireGuestAccount, userController.postReview);
 
 module.exports = userRouter;

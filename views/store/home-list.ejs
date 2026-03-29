@@ -203,10 +203,11 @@
                                     <h3 class="font-semibold text-gray-800 text-base leading-tight line-clamp-1">
                                         <%= home.houseName %>
                                     </h3>
-                                    <% if (!isHostUser && home.rating && home.rating > 0) { %>
+                                    <% if (home.reviewCount > 0) { %>
                                         <span class="flex items-center gap-0.5 text-sm text-gray-700 shrink-0">
                                             <span class="text-rose-400">★</span>
                                             <%= home.rating %>
+                                            <span class="text-gray-400 text-xs">(<%= home.reviewCount %>)</span>
                                         </span>
                                     <% } %>
                                 </div>
